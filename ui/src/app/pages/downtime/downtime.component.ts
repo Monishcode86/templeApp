@@ -178,9 +178,7 @@ export class DowntimeComponent implements OnInit, OnDestroy {
       main_reason: ''
     });
 
-    this.subReasons.set([
-      { subreason_id: 'SR-1', sub_reason: '' }
-    ]);
+    this.subReasons.set([]);
 
     this.isModalOpen.set(true);
   }
@@ -216,9 +214,7 @@ export class DowntimeComponent implements OnInit, OnDestroy {
         }
       ]);
     } else {
-      this.subReasons.set([
-        { subreason_id: 'SR-1', sub_reason: '' }
-      ]);
+      this.subReasons.set([]);
     }
 
     this.isModalOpen.set(true);
@@ -281,36 +277,39 @@ export class DowntimeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const subs = this.subReasons();
-    if (!subs || subs.length === 0) {
-      this.modalError.set('At least one sub-reason is required.');
-      return;
-    }
-
+    const subs = this.subReasons() || [];
     const seenIds = new Set<string>();
     const sanitizedSubs: DowntimeSubReason[] = [];
 
     for (let i = 0; i < subs.length; i++) {
       const item = subs[i];
-      if (!item.subreason_id || !item.subreason_id.trim()) {
+      const trimmedId = item.subreason_id ? item.subreason_id.trim() : '';
+      const trimmedDesc = item.sub_reason ? item.sub_reason.trim() : '';
+
+      // If row is completely blank, skip it
+      if (!trimmedId && !trimmedDesc) {
+        continue;
+      }
+
+      if (!trimmedId) {
         this.modalError.set(`Sub-reason #${i + 1} requires a valid Sub-Reason ID.`);
         return;
       }
-      if (!item.sub_reason || !item.sub_reason.trim()) {
+      if (!trimmedDesc) {
         this.modalError.set(`Sub-reason #${i + 1} requires a description.`);
         return;
       }
 
-      const idKey = item.subreason_id.trim().toLowerCase();
+      const idKey = trimmedId.toLowerCase();
       if (seenIds.has(idKey)) {
-        this.modalError.set(`Duplicate sub-reason ID '${item.subreason_id.trim()}'. IDs must be unique.`);
+        this.modalError.set(`Duplicate sub-reason ID '${trimmedId}'. IDs must be unique.`);
         return;
       }
       seenIds.add(idKey);
 
       sanitizedSubs.push({
-        subreason_id: item.subreason_id.trim(),
-        sub_reason: item.sub_reason.trim()
+        subreason_id: trimmedId,
+        sub_reason: trimmedDesc
       });
     }
 
@@ -320,8 +319,8 @@ export class DowntimeComponent implements OnInit, OnDestroy {
       downtime_type: form.downtime_type,
       mainreason_id: form.mainreason_id.trim(),
       main_reason: form.main_reason.trim(),
-      subreason_id: sanitizedSubs[0].subreason_id,
-      sub_reason: sanitizedSubs[0].sub_reason,
+      subreason_id: sanitizedSubs.length > 0 ? sanitizedSubs[0].subreason_id : '',
+      sub_reason: sanitizedSubs.length > 0 ? sanitizedSubs[0].sub_reason : '',
       sub_reasons: sanitizedSubs
     };
 

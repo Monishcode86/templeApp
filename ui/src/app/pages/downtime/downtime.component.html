@@ -242,7 +242,7 @@
                         <span class="sub-text">{{ reason.sub_reason }}</span>
                       </div>
                     } @else {
-                      <span class="cell-muted font-sm">-</span>
+                      <span class="cell-muted font-sm" style="font-style: italic; opacity: 0.75;">— None —</span>
                     }
                   </div>
                 </td>
@@ -454,10 +454,13 @@
           </div>
         </div>
 
-        <!-- Sub-Reasons Configuration Box -->
+        <!-- Sub-Reasons Configuration Box (Optional) -->
         <div class="mode-preview-box" style="margin-top: 1rem">
           <div class="builder-bar">
-            <span class="preview-tag">{{ 'SUB_REASONS_BUILDER' | translate }} ({{ subReasons().length }})</span>
+            <span class="preview-tag">
+              {{ 'SUB_REASONS_BUILDER' | translate }} ({{ subReasons().length }})
+              <span style="font-weight: normal; opacity: 0.8; margin-left: 0.25rem;">— Optional</span>
+            </span>
             <button type="button" class="btn btn-outline btn-sm add-op-btn" (click)="addSubReason()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -472,49 +475,56 @@
               <thead>
                 <tr>
                   <th style="width: 40px">#</th>
-                  <th style="width: 200px">{{ 'COL_SUB_REASON_ID' | translate }} *</th>
-                  <th>{{ 'COL_SUB_REASON' | translate }} *</th>
+                  <th style="width: 200px">{{ 'COL_SUB_REASON_ID' | translate }}</th>
+                  <th>{{ 'COL_SUB_REASON' | translate }}</th>
                   <th style="width: 50px; text-align: center">Action</th>
                 </tr>
               </thead>
               <tbody>
-                @for (sub of subReasons(); track $index) {
+                @if (subReasons().length === 0) {
                   <tr>
-                    <td class="op-seq">#{{ $index + 1 }}</td>
-                    <td>
-                      <input
-                        type="text"
-                        class="font-mono"
-                        placeholder="e.g. SR-01, SR-10"
-                        [ngModel]="sub.subreason_id"
-                        (ngModelChange)="sub.subreason_id = $event"
-                        name="sub_id_{{ $index }}"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        placeholder="e.g. Bearing Seized, Outer Diameter Oversized"
-                        [ngModel]="sub.sub_reason"
-                        (ngModelChange)="sub.sub_reason = $event"
-                        name="sub_desc_{{ $index }}"
-                      />
-                    </td>
-                    <td style="text-align: center">
-                      <button
-                        type="button"
-                        class="btn-icon-danger"
-                        [disabled]="subReasons().length <= 1"
-                        (click)="removeSubReason($index)"
-                        title="Remove Sub-Reason"
-                      >
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <line x1="18" y1="6" x2="6" y2="18"></line>
-                          <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                      </button>
+                    <td colspan="4" class="empty-sub-cell" style="text-align: center; padding: 1.2rem; color: var(--text-muted); font-size: 0.85rem;">
+                      <span>No sub-reasons configured. Sub-reasons are optional — click <strong>"+ Add Sub-Reason"</strong> if you wish to specify detailed causes.</span>
                     </td>
                   </tr>
+                } @else {
+                  @for (sub of subReasons(); track $index) {
+                    <tr>
+                      <td class="op-seq">#{{ $index + 1 }}</td>
+                      <td>
+                        <input
+                          type="text"
+                          class="font-mono"
+                          placeholder="e.g. SR-01, SR-10"
+                          [ngModel]="sub.subreason_id"
+                          (ngModelChange)="sub.subreason_id = $event"
+                          name="sub_id_{{ $index }}"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          placeholder="e.g. Bearing Seized, Outer Diameter Oversized"
+                          [ngModel]="sub.sub_reason"
+                          (ngModelChange)="sub.sub_reason = $event"
+                          name="sub_desc_{{ $index }}"
+                        />
+                      </td>
+                      <td style="text-align: center">
+                        <button
+                          type="button"
+                          class="btn-icon-danger"
+                          (click)="removeSubReason($index)"
+                          title="Remove Sub-Reason"
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  }
                 }
               </tbody>
             </table>

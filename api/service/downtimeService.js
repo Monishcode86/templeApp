@@ -4,7 +4,7 @@ const logger = require('../config/logger');
 const SCHEMA_NAME = 'downtimes';
 
 /**
- * Validate and sanitize sub-reasons
+ * Validate and sanitize sub-reasons (optional)
  */
 const sanitizeSubReasons = (subReasons, singleSubId, singleSubName) => {
     const list = Array.isArray(subReasons) ? [...subReasons] : [];
@@ -17,10 +17,9 @@ const sanitizeSubReasons = (subReasons, singleSubId, singleSubName) => {
         });
     }
 
+    // Sub-reasons are optional: if list is empty, return empty array
     if (list.length === 0) {
-        const error = new Error('At least one sub-reason (ID and description) is required.');
-        error.statusCode = 400;
-        throw error;
+        return [];
     }
 
     const seenIds = new Set();
@@ -28,18 +27,25 @@ const sanitizeSubReasons = (subReasons, singleSubId, singleSubName) => {
 
     for (let i = 0; i < list.length; i++) {
         const item = list[i];
-        if (!item.subreason_id || !item.subreason_id.trim()) {
+        const trimmedId = item.subreason_id ? item.subreason_id.trim() : '';
+        const trimmedDesc = item.sub_reason ? item.sub_reason.trim() : '';
+
+        // If both ID and description are empty, skip the row
+        if (!trimmedId && !trimmedDesc) {
+            continue;
+        }
+
+        if (!trimmedId) {
             const error = new Error(`Sub-reason #${i + 1} requires a valid subreason_id.`);
             error.statusCode = 400;
             throw error;
         }
-        if (!item.sub_reason || !item.sub_reason.trim()) {
+        if (!trimmedDesc) {
             const error = new Error(`Sub-reason #${i + 1} requires a valid sub_reason description.`);
             error.statusCode = 400;
             throw error;
         }
 
-        const trimmedId = item.subreason_id.trim();
         const lowerId = trimmedId.toLowerCase();
         if (seenIds.has(lowerId)) {
             const error = new Error(`Duplicate subreason_id '${trimmedId}'. Sub-reason IDs must be unique within the reason.`);
@@ -50,7 +56,7 @@ const sanitizeSubReasons = (subReasons, singleSubId, singleSubName) => {
 
         sanitized.push({
             subreason_id: trimmedId,
-            sub_reason: item.sub_reason.trim()
+            sub_reason: trimmedDesc
         });
     }
 
@@ -129,8 +135,8 @@ const addDowntimeReason = async (reasonData) => {
         downtime_type: normalizedType,
         mainreason_id: trimmedMainReasonId,
         main_reason: trimmedMainReason,
-        subreason_id: sanitizedSubs[0].subreason_id,
-        sub_reason: sanitizedSubs[0].sub_reason,
+        subreason_id: sanitizedSubs.length > 0 ? sanitizedSubs[0].subreason_id : '',
+        sub_reason: sanitizedSubs.length > 0 ? sanitizedSubs[0].sub_reason : '',
         sub_reasons: sanitizedSubs
     };
 
@@ -238,16 +244,16 @@ const updateDowntimeReason = async (id, updateData) => {
         updateFields.main_reason = updateData.main_reason.trim();
     }
 
-    // Sub-reasons update
-    if (updateData.sub_reasons || (updateData.subreason_id && updateData.sub_reason)) {
+    // Sub-reasons update (optional)
+    if (updateData.sub_reasons !== undefined || (updateData.subreason_id !== undefined && updateData.sub_reason !== undefined)) {
         const sanitizedSubs = sanitizeSubReasons(
             updateData.sub_reasons,
             updateData.subreason_id,
             updateData.sub_reason
         );
         updateFields.sub_reasons = sanitizedSubs;
-        updateFields.subreason_id = sanitizedSubs[0].subreason_id;
-        updateFields.sub_reason = sanitizedSubs[0].sub_reason;
+        updateFields.subreason_id = sanitizedSubs.length > 0 ? sanitizedSubs[0].subreason_id : '';
+        updateFields.sub_reason = sanitizedSubs.length > 0 ? sanitizedSubs[0].sub_reason : '';
     }
 
     await commonDao.updateOne(
