@@ -57,6 +57,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/machinetype/machinetype.component').then((m) => m.MachineTypeComponent),
       },
+      {
+        path: 'machines',
+        loadComponent: () =>
+          import('./pages/machines/machines.component').then((m) => m.MachinesComponent),
+      },
     ],
   },
   {

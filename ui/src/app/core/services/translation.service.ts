@@ -21,6 +21,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     NAV_PARTS: 'Part Master Configuration',
     NAV_DOWNTIME: 'Downtime Configuration',
     NAV_MACHINE_TYPE: 'Machine Type Configuration',
+    NAV_MACHINES: 'Machine Configuration',
     NAV_SYSTEM: 'System Health',
     NAV_LOGOUT: 'Logout',
     NAV_PROFILE: 'Profile',
@@ -242,7 +243,24 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     LABEL_DESCRIPTION: 'Description / Notes',
     DELETE_MACHINE_TYPE_TITLE: 'Delete Machine Type',
     DELETE_MACHINE_TYPE_CONFIRM: 'Are you sure you want to delete this machine type?',
-    MACHINE_TYPE_DELETE_WARNING: 'This machine type will be permanently removed from this plant.'
+    MACHINE_TYPE_DELETE_WARNING: 'This machine type will be permanently removed from this plant.',
+
+    // Machine Configuration
+    MACHINES_HEADING: 'Machine Configuration',
+    MACHINES_SUBHEADING: 'Configure and manage production machines per plant and department',
+    ADD_MACHINE_BTN: 'Add Machine',
+    SEARCH_MACHINES_PLACEHOLDER: 'Search by machine ID, type, IP, license, or department...',
+    COL_MACHINE_ID: 'Machine ID',
+    COL_MACHINE_IP: 'Machine IP',
+    COL_MACHINE_LISCENCE: 'Machine License',
+    NO_MACHINES_FOUND: 'No machines configured yet. Click "Add Machine" to create your first machine.',
+    EDIT_MACHINE_TITLE: 'Edit Machine',
+    ADD_MACHINE_TITLE: 'Configure Machine',
+    LABEL_MACHINE_IP: 'Machine IP Address',
+    LABEL_MACHINE_LISCENCE: 'Machine License',
+    DELETE_MACHINE_TITLE: 'Delete Machine',
+    DELETE_MACHINE_CONFIRM: 'Are you sure you want to delete this machine?',
+    MACHINE_DELETE_WARNING: 'This machine configuration will be permanently removed from this plant.'
   },
   es: {
     // Navigation & Layout
@@ -256,6 +274,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     NAV_PARTS: 'Configuración de Partes',
     NAV_DOWNTIME: 'Configuración de Paradas',
     NAV_MACHINE_TYPE: 'Configuración de Tipos de Máquina',
+    NAV_MACHINES: 'Configuración de Máquinas',
     NAV_SYSTEM: 'Estado del Sistema',
     NAV_LOGOUT: 'Cerrar Sesión',
     NAV_PROFILE: 'Perfil',
@@ -477,7 +496,24 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     LABEL_DESCRIPTION: 'Descripción / Notas',
     DELETE_MACHINE_TYPE_TITLE: 'Eliminar Tipo de Máquina',
     DELETE_MACHINE_TYPE_CONFIRM: '¿Está seguro de que desea eliminar este tipo de máquina?',
-    MACHINE_TYPE_DELETE_WARNING: 'Este tipo de máquina se eliminará permanentemente de esta planta.'
+    MACHINE_TYPE_DELETE_WARNING: 'Este tipo de máquina se eliminará permanentemente de esta planta.',
+
+    // Machine Configuration (ES)
+    MACHINES_HEADING: 'Configuración de Máquinas',
+    MACHINES_SUBHEADING: 'Configure y gestione máquinas de producción por planta y departamento',
+    ADD_MACHINE_BTN: 'Agregar Máquina',
+    SEARCH_MACHINES_PLACEHOLDER: 'Buscar por ID de máquina, tipo, IP, licencia o departamento...',
+    COL_MACHINE_ID: 'ID de Máquina',
+    COL_MACHINE_IP: 'IP de Máquina',
+    COL_MACHINE_LISCENCE: 'Licencia de Máquina',
+    NO_MACHINES_FOUND: 'Aún no hay máquinas configuradas. Haga clic en "Agregar Máquina" para crear la primera.',
+    EDIT_MACHINE_TITLE: 'Editar Máquina',
+    ADD_MACHINE_TITLE: 'Configurar Máquina',
+    LABEL_MACHINE_IP: 'Dirección IP de Máquina',
+    LABEL_MACHINE_LISCENCE: 'Licencia de Máquina',
+    DELETE_MACHINE_TITLE: 'Eliminar Máquina',
+    DELETE_MACHINE_CONFIRM: '¿Está seguro de que desea eliminar esta máquina?',
+    MACHINE_DELETE_WARNING: 'Esta configuración de máquina se eliminará permanentemente de esta planta.'
   },
   fr: {
     // Navigation & Layout
@@ -491,6 +527,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     NAV_PARTS: 'Configuration des Pièces',
     NAV_DOWNTIME: 'Configuration des Arrêts',
     NAV_MACHINE_TYPE: 'Configuration des Types de Machine',
+    NAV_MACHINES: 'Configuration des Machines',
     NAV_SYSTEM: 'État du Système',
     NAV_LOGOUT: 'Déconnexion',
     NAV_PROFILE: 'Profil',
@@ -712,7 +749,24 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     LABEL_DESCRIPTION: 'Description / Remarques',
     DELETE_MACHINE_TYPE_TITLE: 'Supprimer le Type de Machine',
     DELETE_MACHINE_TYPE_CONFIRM: 'Voulez-vous vraiment supprimer ce type de machine ?',
-    MACHINE_TYPE_DELETE_WARNING: 'Ce type de machine sera définitivement supprimé de cette usine.'
+    MACHINE_TYPE_DELETE_WARNING: 'Ce type de machine sera définitivement supprimé de cette usine.',
+
+    // Machine Configuration (FR)
+    MACHINES_HEADING: 'Configuration des Machines',
+    MACHINES_SUBHEADING: 'Configurez et gérez les machines de production par usine et département',
+    ADD_MACHINE_BTN: 'Ajouter une Machine',
+    SEARCH_MACHINES_PLACEHOLDER: 'Rechercher par ID machine, type, IP, licence ou département...',
+    COL_MACHINE_ID: 'ID Machine',
+    COL_MACHINE_IP: 'IP Machine',
+    COL_MACHINE_LISCENCE: 'Licence Machine',
+    NO_MACHINES_FOUND: 'Aucune machine configurée. Cliquez sur "Ajouter une Machine" pour créer la première.',
+    EDIT_MACHINE_TITLE: 'Modifier la Machine',
+    ADD_MACHINE_TITLE: 'Configurer une Machine',
+    LABEL_MACHINE_IP: 'Adresse IP de la Machine',
+    LABEL_MACHINE_LISCENCE: 'Licence de la Machine',
+    DELETE_MACHINE_TITLE: 'Supprimer la Machine',
+    DELETE_MACHINE_CONFIRM: 'Voulez-vous vraiment supprimer cette machine ?',
+    MACHINE_DELETE_WARNING: 'Cette configuration de machine sera définitivement supprimée de cette usine.'
   }
 };
 

@@ -115,6 +115,21 @@ export interface MachineType {
   updatedAt?: string;
 }
 
+export interface Machine {
+  _id?: string;
+  plant_id: string;
+  plant_name: string;
+  department_id: string;
+  department_name: string;
+  machinetype: string;
+  machinetype_id?: string;
+  machine_id?: string; // M1, M2...
+  machine_ip: string;
+  machine_liscence: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;

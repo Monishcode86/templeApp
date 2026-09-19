@@ -300,6 +300,31 @@
               </div>
               <span class="nav-sublabel">{{ 'NAV_MACHINE_TYPE' | translate }}</span>
             </a>
+
+            <a
+              routerLink="/machines"
+              routerLinkActive="active"
+              (click)="closeMobileSidebar()"
+              class="nav-subitem"
+            >
+              <div class="nav-subicon">
+                <svg
+                  width="17"
+                  height="17"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+              </div>
+              <span class="nav-sublabel">{{ 'NAV_MACHINES' | translate }}</span>
+            </a>
           </div>
         }
       </div>
@@ -613,6 +638,34 @@
                 <div class="item-content">
                   <span class="item-title">{{ 'NAV_MACHINE_TYPE' | translate }}</span>
                   <span class="item-desc">Machine types and classifications per plant</span>
+                </div>
+              </a>
+
+              <a
+                routerLink="/machines"
+                routerLinkActive="active"
+                (click)="closeConfigDropdown()"
+                class="dropdown-item config-dropdown-item"
+              >
+                <div class="item-icon-box">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                  </svg>
+                </div>
+                <div class="item-content">
+                  <span class="item-title">{{ 'NAV_MACHINES' | translate }}</span>
+                  <span class="item-desc">Production machine fleet, IPs &amp; licenses</span>
                 </div>
               </a>
             </div>

@@ -5,6 +5,7 @@ const DepartmentModel = require('../model/departmentModel');
 const PartModel = require('../model/partModel');
 const DowntimeModel = require('../model/downtimeModel');
 const MachineTypeModel = require('../model/machineTypeModel');
+const MachineModel = require('../model/machineModel');
 
 const schema = {
     users: UserModel,
@@ -27,7 +28,10 @@ const schema = {
     DowntimeModel: DowntimeModel,
     machinetypes: MachineTypeModel,
     machinetype: MachineTypeModel,
-    MachineTypeModel: MachineTypeModel
+    MachineTypeModel: MachineTypeModel,
+    machines: MachineModel,
+    machine: MachineModel,
+    MachineModel: MachineModel
 };
 
 module.exports = schema;
