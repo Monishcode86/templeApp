@@ -1,0 +1,570 @@
+<div class="config-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-titles">
+      <h1 class="page-title">{{ 'DOWNTIME_HEADING' | translate }}</h1>
+      <p class="page-subtitle">{{ 'DOWNTIME_SUBHEADING' | translate }}</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary create-btn" (click)="openAddModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>{{ 'ADD_DOWNTIME_BTN' | translate }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast / Alerts -->
+  @if (successMessage()) {
+    <div class="toast-alert toast-success">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <span>{{ successMessage() }}</span>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="toast-alert toast-error">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <!-- Filter & Search Toolbar -->
+  <div class="toolbar-card">
+    <div class="toolbar-left-group">
+      <!-- Search Input -->
+      <div class="search-input-wrapper">
+        <svg
+          class="search-icon"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="text"
+          [placeholder]="'SEARCH_DOWNTIME_PLACEHOLDER' | translate"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchChange($event)"
+        />
+        @if (searchQuery()) {
+          <button type="button" class="clear-search-btn" (click)="clearSearch()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        }
+      </div>
+
+      <!-- Plant Filter Dropdown -->
+      <div class="plant-filter-dropdown" title="Filter by Plant">
+        <svg class="plant-select-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M2 20V10l5-3v3l5-3v3l5-3v13H2z"></path>
+        </svg>
+        <select
+          class="filter-select"
+          [ngModel]="filterPlantId()"
+          (ngModelChange)="onFilterPlantChange($event)"
+        >
+          @if (plantsList().length === 0) {
+            <option value="">-- No Plants Configured --</option>
+          } @else {
+            @for (plant of plantsList(); track plant.plant_id) {
+              <option [value]="plant.plant_id">
+                {{ plant.plant_name }} ({{ plant.plant_id }})
+              </option>
+            }
+          }
+        </select>
+      </div>
+
+      <!-- Type Filter Tabs (All / Rejection / Downtime) -->
+      <div class="type-filter-segmented">
+        <button
+          type="button"
+          class="type-tab-btn"
+          [class.active]="filterType() === 'all'"
+          (click)="setFilterType('all')"
+        >
+          {{ 'ALL_TYPES' | translate }}
+        </button>
+        <button
+          type="button"
+          class="type-tab-btn tab-rejection"
+          [class.active]="filterType() === 'rejection'"
+          (click)="setFilterType('rejection')"
+        >
+          <span class="type-tab-dot dot-rejection"></span>
+          {{ 'TYPE_REJECTION' | translate }}
+        </button>
+        <button
+          type="button"
+          class="type-tab-btn tab-downtime"
+          [class.active]="filterType() === 'downtime'"
+          (click)="setFilterType('downtime')"
+        >
+          <span class="type-tab-dot dot-downtime"></span>
+          {{ 'TYPE_DOWNTIME' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar-stats">
+      <span>
+        Showing <strong>{{ reasonsList().length }}</strong> of {{ totalCount() }} reasons
+      </span>
+    </div>
+  </div>
+
+  <!-- Downtime Reasons Data Table -->
+  <div class="panel-card">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>{{ 'COL_REASON_ID' | translate }}</th>
+            <th>{{ 'COL_DOWNTIME_TYPE' | translate }}</th>
+            <th>{{ 'COL_PLANT' | translate }}</th>
+            <th>{{ 'COL_MAIN_REASON' | translate }}</th>
+            <th>{{ 'COL_SUB_REASONS' | translate }}</th>
+            <th class="text-right">{{ 'COL_ACTIONS' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (isLoading()) {
+            <tr>
+              <td colspan="6" class="empty-cell">
+                <div class="empty-state-content">
+                  <div class="loading-spinner"></div>
+                  <p>Loading reasons...</p>
+                </div>
+              </td>
+            </tr>
+          } @else if (reasonsList().length === 0) {
+            <tr>
+              <td colspan="6" class="empty-cell">
+                <div class="empty-state-content">
+                  <svg
+                    width="40"
+                    height="40"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    class="empty-icon"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  <p>{{ 'NO_DOWNTIME_FOUND' | translate }}</p>
+                </div>
+              </td>
+            </tr>
+          } @else {
+            @for (reason of reasonsList(); track reason._id) {
+              <tr>
+                <td>
+                  <span
+                    class="reason-id-badge"
+                    [class.badge-rej-id]="reason.downtime_type === 'rejection'"
+                    [class.badge-dt-id]="reason.downtime_type === 'downtime'"
+                  >
+                    {{ reason.reason_id }}
+                  </span>
+                </td>
+                <td>
+                  @if (reason.downtime_type === 'rejection') {
+                    <span class="badge badge-rejection">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                      </svg>
+                      {{ 'TYPE_REJECTION' | translate }}
+                    </span>
+                  } @else {
+                    <span class="badge badge-downtime">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                      {{ 'TYPE_DOWNTIME' | translate }}
+                    </span>
+                  }
+                </td>
+                <td>
+                  <div class="plant-cell">
+                    <div class="plant-icon-box">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 20V10l5-3v3l5-3v3l5-3v13H2z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <span class="cell-primary">{{ reason.plant_name }}</span>
+                      <span class="plant-code-badge" style="margin-left: 0.4rem; font-size: 0.7rem">{{ reason.plant_id }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="main-reason-cell">
+                    <span class="main-reason-id font-mono">{{ reason.mainreason_id }}</span>
+                    <span class="cell-primary font-medium">{{ reason.main_reason }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="sub-reasons-wrap">
+                    @if (reason.sub_reasons && reason.sub_reasons.length > 0) {
+                      @for (sub of reason.sub_reasons; track sub.subreason_id) {
+                        <div class="sub-reason-pill">
+                          <span class="sub-id font-mono">{{ sub.subreason_id }}</span>
+                          <span class="sub-text">{{ sub.sub_reason }}</span>
+                        </div>
+                      }
+                    } @else if (reason.subreason_id && reason.sub_reason) {
+                      <div class="sub-reason-pill">
+                        <span class="sub-id font-mono">{{ reason.subreason_id }}</span>
+                        <span class="sub-text">{{ reason.sub_reason }}</span>
+                      </div>
+                    } @else {
+                      <span class="cell-muted font-sm">-</span>
+                    }
+                  </div>
+                </td>
+                <td class="text-right">
+                  <div class="action-buttons">
+                    <button
+                      type="button"
+                      class="action-btn edit-btn"
+                      (click)="openEditModal(reason)"
+                      [title]="'EDIT_DOWNTIME_TITLE' | translate"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                      <span class="btn-text">{{ 'EDIT' | translate }}</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="action-btn delete-btn"
+                      (click)="openDeleteConfirm(reason)"
+                      [title]="'DELETE_DOWNTIME_TITLE' | translate"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                      <span class="btn-text">{{ 'DELETE' | translate }}</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (reasonsList().length > 0) {
+      <app-pagination
+        [total]="totalCount()"
+        [page]="currentPage()"
+        [limit]="pageSize()"
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        (pageChange)="onPageChange($event)"
+        (limitChange)="onLimitChange($event)"
+      >
+      </app-pagination>
+    }
+  </div>
+</div>
+
+<!-- Create / Edit Reason Modal Dialog -->
+@if (isModalOpen()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-card modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          {{ (isEditMode() ? 'EDIT_DOWNTIME_TITLE' : 'ADD_DOWNTIME_TITLE') | translate }}
+        </h3>
+        <button class="icon-btn close-modal" (click)="closeModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      @if (modalError()) {
+        <div class="modal-error-alert">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>{{ modalError() }}</span>
+        </div>
+      }
+
+      <form (ngSubmit)="saveReason()" class="modal-form">
+        <!-- Row 1: Reason ID & Plant Selector -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>
+              {{ 'COL_REASON_ID' | translate }}
+              <span class="label-note">
+                (Auto-generated with prefix "{{ formData().downtime_type === 'rejection' ? 'RE-' : 'DT-' }}")
+              </span>
+            </label>
+            <input
+              type="text"
+              disabled
+              [value]="
+                isEditMode()
+                  ? editingReason()?.reason_id || ''
+                  : (formData().downtime_type === 'rejection' ? 'RE- (auto)' : 'DT- (auto)')
+              "
+              class="input-readonly font-mono"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>
+              {{ 'COL_PLANT' | translate }} *
+              @if (isEditMode()) {
+                <span class="label-note">(locked)</span>
+              }
+            </label>
+            <div class="select-wrapper">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 20V10l5-3v3l5-3v3l5-3v13H2z"></path>
+              </svg>
+              <select
+                required
+                [disabled]="isEditMode()"
+                [class.input-readonly]="isEditMode()"
+                [ngModel]="formData().plant_id"
+                (ngModelChange)="onPlantSelectChange($event)"
+                name="plant_id"
+              >
+                <option value="">{{ 'SELECT_PLANT' | translate }}</option>
+                @for (plant of plantsList(); track plant.plant_id) {
+                  <option [value]="plant.plant_id">
+                    {{ plant.plant_name }} ({{ plant.plant_id }})
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Downtime Type Selection (Side-by-side cards) -->
+        <div class="shift-config-section">
+          <label class="section-title">{{ 'LABEL_DOWNTIME_TYPE' | translate }}</label>
+          <p class="section-desc">
+            Select the category: Rejection (defects &amp; scrap, prefixed RE-) or Downtime (stoppages &amp; breakdown, prefixed DT-).
+          </p>
+
+          <div class="shift-mode-cards mode-cards-grid">
+            <!-- Option 1: Rejection Card -->
+            <div
+              class="mode-card"
+              [class.selected]="formData().downtime_type === 'rejection'"
+              [class.disabled-card]="isEditMode()"
+              (click)="!isEditMode() && setDowntimeType('rejection')"
+            >
+              <div class="mode-card-header">
+                <div class="custom-radio" [class.checked]="formData().downtime_type === 'rejection'"></div>
+                <div class="mode-card-text">
+                  <div class="mode-title-row">
+                    <h4 class="mode-card-title">{{ 'TYPE_REJECTION' | translate }}</h4>
+                    <span class="badge-rej-tag">Prefix: RE-</span>
+                  </div>
+                  <p class="mode-card-subtitle">Scrap, dimensional defects, visual defects &amp; process rejection</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Option 2: Downtime Card -->
+            <div
+              class="mode-card"
+              [class.selected]="formData().downtime_type === 'downtime'"
+              [class.disabled-card]="isEditMode()"
+              (click)="!isEditMode() && setDowntimeType('downtime')"
+            >
+              <div class="mode-card-header">
+                <div class="custom-radio" [class.checked]="formData().downtime_type === 'downtime'"></div>
+                <div class="mode-card-text">
+                  <div class="mode-title-row">
+                    <h4 class="mode-card-title">{{ 'TYPE_DOWNTIME' | translate }}</h4>
+                    <span class="badge-dt-tag">Prefix: DT-</span>
+                  </div>
+                  <p class="mode-card-subtitle">Machine breakdown, tool wear, electrical fault &amp; setup delays</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Main Reason ID & Main Reason Name -->
+        <div class="form-row-2" style="margin-top: 1rem">
+          <div class="form-group">
+            <label>
+              {{ 'LABEL_MAIN_REASON_ID' | translate }} *
+              <span class="label-note">(Unique per plant &amp; type)</span>
+            </label>
+            <input
+              type="text"
+              required
+              class="font-mono"
+              placeholder="e.g. MR-01, MR-MECH-01"
+              [ngModel]="formData().mainreason_id"
+              (ngModelChange)="formData.update(f => ({ ...f, mainreason_id: $event }))"
+              name="mainreason_id"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>{{ 'LABEL_MAIN_REASON' | translate }} *</label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. Mechanical Breakdown, Material Defect"
+              [ngModel]="formData().main_reason"
+              (ngModelChange)="formData.update(f => ({ ...f, main_reason: $event }))"
+              name="main_reason"
+            />
+          </div>
+        </div>
+
+        <!-- Sub-Reasons Configuration Box -->
+        <div class="mode-preview-box" style="margin-top: 1rem">
+          <div class="builder-bar">
+            <span class="preview-tag">{{ 'SUB_REASONS_BUILDER' | translate }} ({{ subReasons().length }})</span>
+            <button type="button" class="btn btn-outline btn-sm add-op-btn" (click)="addSubReason()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>{{ 'ADD_SUB_REASON_BTN' | translate }}</span>
+            </button>
+          </div>
+
+          <div class="op-table-wrap">
+            <table class="op-table">
+              <thead>
+                <tr>
+                  <th style="width: 40px">#</th>
+                  <th style="width: 200px">{{ 'COL_SUB_REASON_ID' | translate }} *</th>
+                  <th>{{ 'COL_SUB_REASON' | translate }} *</th>
+                  <th style="width: 50px; text-align: center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (sub of subReasons(); track $index) {
+                  <tr>
+                    <td class="op-seq">#{{ $index + 1 }}</td>
+                    <td>
+                      <input
+                        type="text"
+                        class="font-mono"
+                        placeholder="e.g. SR-01, SR-10"
+                        [ngModel]="sub.subreason_id"
+                        (ngModelChange)="sub.subreason_id = $event"
+                        name="sub_id_{{ $index }}"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        placeholder="e.g. Bearing Seized, Outer Diameter Oversized"
+                        [ngModel]="sub.sub_reason"
+                        (ngModelChange)="sub.sub_reason = $event"
+                        name="sub_desc_{{ $index }}"
+                      />
+                    </td>
+                    <td style="text-align: center">
+                      <button
+                        type="button"
+                        class="btn-icon-danger"
+                        [disabled]="subReasons().length <= 1"
+                        (click)="removeSubReason($index)"
+                        title="Remove Sub-Reason"
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Standard Modal Actions -->
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" (click)="closeModal()">
+            {{ 'CANCEL' | translate }}
+          </button>
+          <button type="submit" class="btn btn-primary">
+            {{ (isEditMode() ? 'SAVE' : 'ADD_DOWNTIME_BTN') | translate }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (isDeleteConfirmOpen()) {
+  <div class="modal-overlay" (click)="cancelDelete()">
+    <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ 'DELETE_DOWNTIME_TITLE' | translate }}</h3>
+        <button class="icon-btn close-modal" (click)="cancelDelete()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>{{ 'DELETE_DOWNTIME_CONFIRM' | translate }}</p>
+        <div class="delete-target-box">
+          <strong>{{ reasonToDelete()?.reason_id }}</strong>: {{ reasonToDelete()?.main_reason }}
+          ({{ reasonToDelete()?.plant_name }}, {{ reasonToDelete()?.downtime_type | uppercase }})
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancelDelete()">
+          {{ 'CANCEL' | translate }}
+        </button>
+        <button type="button" class="btn btn-danger" [disabled]="isLoading()" (click)="confirmDelete()">
+          {{ 'CONFIRM_DELETE_BTN' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

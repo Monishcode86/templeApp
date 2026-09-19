@@ -84,6 +84,26 @@ export interface PartMaster {
   updatedAt?: string;
 }
 
+export interface DowntimeSubReason {
+  subreason_id: string;
+  sub_reason: string;
+}
+
+export interface DowntimeReason {
+  _id?: string;
+  plant_id: string;
+  plant_name: string;
+  downtime_type: 'rejection' | 'downtime';
+  reason_id?: string; // RE-1 or DT-1
+  mainreason_id: string;
+  main_reason: string;
+  subreason_id?: string;
+  sub_reason?: string;
+  sub_reasons?: DowntimeSubReason[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;

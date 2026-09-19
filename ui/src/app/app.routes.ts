@@ -47,6 +47,11 @@ export const routes: Routes = [
         path: 'parts',
         loadComponent: () => import('./pages/parts/parts.component').then((m) => m.PartsComponent),
       },
+      {
+        path: 'downtime',
+        loadComponent: () =>
+          import('./pages/downtime/downtime.component').then((m) => m.DowntimeComponent),
+      },
     ],
   },
   {
