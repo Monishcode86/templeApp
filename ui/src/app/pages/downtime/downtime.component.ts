@@ -249,10 +249,6 @@ export class DowntimeComponent implements OnInit, OnDestroy {
 
   removeSubReason(index: number): void {
     const current = this.subReasons();
-    if (current.length <= 1) {
-      this.modalError.set('At least one sub-reason is required.');
-      return;
-    }
     const updated = current.filter((_, i) => i !== index);
     this.subReasons.set(updated);
     this.modalError.set(null);
