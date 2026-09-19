@@ -1,43 +1,71 @@
-/* Department Configuration Component Styles */
+/* ==========================================================================
+   DEPARTMENT CONFIGURATION PAGE - SPECIFIC OVERRIDES & EXTENSIONS
+   (Core configuration layout and cards inherited from global styles.css)
+   ========================================================================== */
 
 /* Department ID Badge */
 .dept-id-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.22rem 0.6rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 6px;
   font-size: 0.78rem;
   font-weight: 700;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.12));
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1));
   color: var(--color-primary);
-  border: 1px solid rgba(99, 102, 241, 0.28);
+  border: 1px solid rgba(99, 102, 241, 0.25);
   letter-spacing: 0.02em;
 }
 
-/* Badges */
+/* Plant badge inside cell */
+.plant-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.plant-icon-box {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.plant-code-badge {
+  color: var(--color-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+
+/* Shift Mode Badges */
 .badge-plant-shift {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.25rem 0.65rem;
-  border-radius: 20px;
+  padding: 0.22rem 0.65rem;
+  border-radius: 6px;
   font-size: 0.76rem;
   font-weight: 600;
-  background: rgba(16, 185, 129, 0.12);
+  background: rgba(16, 185, 129, 0.1);
   color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  border: 1px solid rgba(16, 185, 129, 0.22);
 }
 
 .badge-custom-shift {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.25rem 0.65rem;
-  border-radius: 20px;
+  padding: 0.22rem 0.65rem;
+  border-radius: 6px;
   font-size: 0.76rem;
   font-weight: 600;
-  background: rgba(99, 102, 241, 0.12);
+  background: rgba(99, 102, 241, 0.1);
   color: var(--color-primary);
   border: 1px solid rgba(99, 102, 241, 0.25);
 }
@@ -46,20 +74,20 @@
 .shift-pills-wrap {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  max-width: 480px;
+  gap: 0.35rem;
+  max-width: 460px;
 }
 
 .shift-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  padding: 0.2rem 0.5rem;
+  padding: 0.18rem 0.5rem;
   border-radius: 6px;
   font-size: 0.75rem;
   background: var(--bg-hover);
   border: 1px solid var(--border-color);
-  color: var(--text-color);
+  color: var(--text-main);
   font-family: 'JetBrains Mono', monospace;
 }
 
@@ -72,6 +100,41 @@
   font-weight: 600;
 }
 
+/* Select Wrapper with Icon */
+.select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.select-wrapper svg {
+  position: absolute;
+  left: 0.85rem;
+  color: var(--text-muted);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.select-wrapper select {
+  padding-left: 2.5rem !important;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.input-readonly {
+  background: var(--bg-hover) !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.label-note {
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-left: 0.35rem;
+}
+
 /* Shift Mode Cards */
 .shift-config-section {
   margin: 1.25rem 0 0.5rem;
@@ -80,9 +143,9 @@
 }
 
 .section-title {
-  font-size: 0.95rem;
+  font-size: 0.925rem;
   font-weight: 700;
-  color: var(--text-color);
+  color: var(--text-main);
   display: block;
   margin-bottom: 0.2rem;
 }
@@ -155,7 +218,7 @@
 .mode-card-title {
   font-size: 0.92rem;
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--text-main);
   margin: 0 0 0.15rem;
 }
 
@@ -169,7 +232,7 @@
 .mode-preview-box {
   margin-top: 0.85rem;
   padding: 0.75rem;
-  background: var(--bg-input);
+  background: var(--bg-input, var(--bg-card));
   border-radius: 8px;
   border: 1px dashed var(--border-color);
 }
@@ -195,13 +258,14 @@
   padding: 0.35rem 0.6rem;
   border-radius: 6px;
   background: var(--bg-card);
+  border: 1px solid var(--border-color);
   font-size: 0.8rem;
   font-family: 'JetBrains Mono', monospace;
 }
 
 .preview-shift-name {
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--text-main);
 }
 
 .preview-shift-time {
@@ -224,40 +288,38 @@
   color: var(--text-muted);
 }
 
-/* Custom Shift Builder */
-.custom-builder-container {
-  margin-top: 1rem;
-  padding-top: 0.85rem;
-  border-top: 1px solid var(--border-color);
-  cursor: default;
+/* 24h Capacity Bar */
+.capacity-bar-wrapper {
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  margin-bottom: 0.85rem;
 }
 
-/* 24h Capacity Track */
-.capacity-bar-wrapper {
-  margin-bottom: 1rem;
-  padding: 0.65rem 0.85rem;
-  border-radius: 8px;
-  background: var(--bg-input);
-  border: 1px solid var(--border-color);
+.capacity-bar-wrapper.capacity-full {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.3);
 }
 
 .capacity-bar-labels {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.4rem;
-  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
 }
 
 .capacity-label {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 0.35rem;
-  color: var(--text-muted);
+  font-size: 0.8rem;
   font-weight: 600;
+  color: var(--text-muted);
 }
 
 .capacity-value {
+  font-size: 0.8rem;
   font-weight: 700;
   color: #3b82f6;
   font-family: 'JetBrains Mono', monospace;
@@ -268,8 +330,7 @@
 }
 
 .capacity-track {
-  height: 7px;
-  width: 100%;
+  height: 6px;
   border-radius: 99px;
   background: var(--border-color);
   overflow: hidden;
@@ -294,7 +355,7 @@
 .custom-shifts-list {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.5rem;
   margin-bottom: 0.85rem;
 }
 
@@ -303,9 +364,9 @@
   grid-template-columns: 32px 1.5fr 1fr 1fr auto auto;
   gap: 0.6rem;
   align-items: center;
-  padding: 0.6rem 0.75rem;
-  border-radius: 8px;
-  background: var(--bg-input);
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  background: var(--bg-hover);
   border: 1px solid var(--border-color);
 }
 
@@ -320,6 +381,7 @@
   color: var(--color-primary);
   font-weight: 700;
   font-size: 0.78rem;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .shift-input-col {
@@ -329,9 +391,10 @@
 }
 
 .shift-input-col input {
-  height: 34px !important;
-  font-size: 0.82rem !important;
-  padding: 0 0.55rem !important;
+  height: 36px !important;
+  font-size: 0.825rem !important;
+  padding: 0 0.6rem !important;
+  border-radius: 8px !important;
 }
 
 .shift-duration-col {
@@ -343,8 +406,8 @@
 
 .custom-dur-badge {
   display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.22rem 0.5rem;
+  border-radius: 6px;
   background: rgba(59, 130, 246, 0.12);
   color: #3b82f6;
   font-weight: 700;
@@ -384,9 +447,8 @@
   font-weight: 600;
 }
 
-/* Typography & Helpers */
 .font-xs {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--text-muted);
 }
