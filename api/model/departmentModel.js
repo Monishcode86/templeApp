@@ -32,9 +32,8 @@ const departmentShiftSchema = new mongoose.Schema(
 const departmentSchema = new mongoose.Schema(
     {
         department_id: {
-            type: String,
-            unique: true
-            // Auto-assigned via pre-save hook (Dep-1, Dep-2, ...)
+            type: String
+            // Auto-assigned per plant via pre-save hook (Dep-1, Dep-2, ...)
         },
         department_name: {
             type: String,
@@ -67,13 +66,16 @@ const departmentSchema = new mongoose.Schema(
     }
 );
 
-// Auto-increment department_id (Dep-1, Dep-2, ...) before save
+// Auto-increment department_id per plant before save (each plant starts from Dep-1)
 departmentSchema.pre('save', async function () {
     if (this.isNew && !this.department_id) {
-        // Find all departments to determine highest numerical ID
-        const allDepts = await this.constructor.find({}, { department_id: 1 });
+        // Find departments for THIS plant only to determine highest numerical ID
+        const plantDepts = await this.constructor.find(
+            { plant_id: this.plant_id },
+            { department_id: 1 }
+        );
         let maxNumber = 0;
-        for (const dept of allDepts) {
+        for (const dept of plantDepts) {
             if (dept.department_id && dept.department_id.startsWith('Dep-')) {
                 const num = parseInt(dept.department_id.replace('Dep-', ''), 10);
                 if (!isNaN(num) && num > maxNumber) {
@@ -85,7 +87,50 @@ departmentSchema.pre('save', async function () {
     }
 });
 
+// Indexes: Department ID and name are unique per plant
+departmentSchema.index({ plant_id: 1, department_id: 1 }, { unique: true });
 departmentSchema.index({ plant_id: 1, department_name: 1 }, { unique: true });
 departmentSchema.index({ plant_id: 1 });
 
-module.exports = mongoose.model('departments', departmentSchema);
+const DepartmentModel = mongoose.model('departments', departmentSchema);
+
+/**
+ * Drop old global department_id_1 index if it exists, and re-sequence existing departments per plant so each plant starts from Dep-1
+ */
+async function syncDepartmentIndexesAndSequence() {
+    try {
+        const collection = DepartmentModel.collection;
+        const indexes = await collection.indexes();
+        const hasGlobalDeptIdIndex = indexes.some(idx => idx.name === 'department_id_1');
+        if (hasGlobalDeptIdIndex) {
+            await collection.dropIndex('department_id_1');
+        }
+
+        // Re-sequence existing departments per plant so every plant starts from Dep-1
+        const distinctPlants = await DepartmentModel.distinct('plant_id');
+        for (const pid of distinctPlants) {
+            const plantDepts = await DepartmentModel.find({ plant_id: pid }).sort({ createdAt: 1, _id: 1 });
+            for (let i = 0; i < plantDepts.length; i++) {
+                const targetId = `Dep-${i + 1}`;
+                if (plantDepts[i].department_id !== targetId) {
+                    await DepartmentModel.updateOne(
+                        { _id: plantDepts[i]._id },
+                        { $set: { department_id: targetId } }
+                    );
+                }
+            }
+        }
+    } catch (err) {
+        // Ignore background sync errors if collection is not yet ready
+    }
+}
+
+if (mongoose.connection.readyState === 1) {
+    syncDepartmentIndexesAndSequence();
+} else {
+    mongoose.connection.on('connected', () => {
+        syncDepartmentIndexesAndSequence();
+    });
+}
+
+module.exports = DepartmentModel;
