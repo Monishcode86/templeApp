@@ -149,9 +149,61 @@
   gap: 1rem;
 }
 
+/* IP Input Wrapper with Live Status */
+.ip-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ip-input-wrapper input {
+  width: 100%;
+  padding-right: 2.2rem;
+}
+
+.ip-status-badge {
+  position: absolute;
+  right: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.ip-status-badge.ip-valid {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.ip-status-badge.ip-invalid {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.field-hint {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.field-hint-error {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: #ef4444;
+  font-weight: 500;
+}
+
 @media (max-width: 640px) {
   .form-row-2 {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
 }
+

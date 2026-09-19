@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, Subscription } from 'rxjs';
@@ -77,6 +77,15 @@ export class MachinesComponent implements OnInit, OnDestroy {
   // Delete modal state
   isDeleteModalOpen = signal<boolean>(false);
   deletingMachine = signal<Machine | null>(null);
+
+  // IPv4 validation & formatting
+  readonly IPV4_REGEX = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+
+  isIpValid = computed(() => {
+    const ip = this.formData().machine_ip?.trim();
+    if (!ip) return false;
+    return this.IPV4_REGEX.test(ip);
+  });
 
   // Search debounce
   private searchSubject = new Subject<string>();
@@ -316,6 +325,81 @@ export class MachinesComponent implements OnInit, OnDestroy {
     }));
   }
 
+  onIpInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    const inputEvent = event as InputEvent;
+    const inputType = inputEvent.inputType || '';
+    const isDeleting = inputType.startsWith('delete');
+    const rawValue = inputElement.value || '';
+
+    const formatted = this.formatIpAddress(rawValue, isDeleting);
+    inputElement.value = formatted;
+    this.formData.update((f) => ({ ...f, machine_ip: formatted }));
+  }
+
+  private formatIpAddress(value: string, isDeleting: boolean = false): string {
+    if (!value) return '';
+
+    // 1. Keep only digits and dots
+    let cleaned = value.replace(/[^0-9.]/g, '');
+
+    // 2. Prevent leading dot
+    cleaned = cleaned.replace(/^\.+/, '');
+
+    // 3. Prevent multiple consecutive dots
+    cleaned = cleaned.replace(/\.{2,}/g, '.');
+
+    // If user pasted or typed numbers without any dots and length > 3:
+    if (!cleaned.includes('.') && cleaned.length > 3) {
+      const chunks: string[] = [];
+      for (let i = 0; i < cleaned.length && chunks.length < 4; i += 3) {
+        let chunk = cleaned.slice(i, i + 3);
+        if (parseInt(chunk, 10) > 255) {
+          chunk = '255';
+        }
+        chunks.push(chunk);
+      }
+      return chunks.join('.');
+    }
+
+    // Split by dots
+    let parts = cleaned.split('.');
+    if (parts.length > 4) {
+      parts = parts.slice(0, 4);
+    }
+
+    const formattedParts: string[] = [];
+    for (let i = 0; i < parts.length; i++) {
+      let part = parts[i];
+      // Max 3 digits per octet
+      if (part.length > 3) {
+        part = part.slice(0, 3);
+      }
+      // Cap at 255
+      if (part.length > 0) {
+        const val = parseInt(part, 10);
+        if (val > 255) {
+          part = '255';
+        }
+      }
+      formattedParts.push(part);
+    }
+
+    let result = formattedParts.join('.');
+
+    // Auto-append dot if typing (not deleting), current octet reached 3 digits, and fewer than 4 octets
+    if (
+      !isDeleting &&
+      parts.length < 4 &&
+      parts[parts.length - 1].length === 3 &&
+      !cleaned.endsWith('.')
+    ) {
+      result += '.';
+    }
+
+    return result;
+  }
+
   saveMachine(): void {
     this.modalError.set(null);
     const form = this.formData();
@@ -337,6 +421,11 @@ export class MachinesComponent implements OnInit, OnDestroy {
 
     if (!form.machine_ip || !form.machine_ip.trim()) {
       this.modalError.set('Machine IP address is required.');
+      return;
+    }
+
+    if (!this.IPV4_REGEX.test(form.machine_ip.trim())) {
+      this.modalError.set('Please enter a valid IPv4 address (e.g. 192.55.55.5).');
       return;
     }
 

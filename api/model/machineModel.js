@@ -40,7 +40,11 @@ const machineSchema = new mongoose.Schema(
         machine_ip: {
             type: String,
             required: [true, 'Machine IP is required'],
-            trim: true
+            trim: true,
+            match: [
+                /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+                'Please enter a valid IPv4 address (e.g. 192.55.55.5)'
+            ]
         },
         machine_liscence: {
             type: String,

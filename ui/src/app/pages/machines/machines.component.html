@@ -344,17 +344,38 @@
             <div class="form-group">
               <label>
                 {{ 'LABEL_MACHINE_IP' | translate }} *
-                <span class="label-note">(Unique in plant)</span>
+                <span class="label-note">(e.g. 192.55.55.5)</span>
               </label>
-              <input
-                type="text"
-                required
-                class="font-mono"
-                placeholder="e.g. 192.168.1.101"
-                [ngModel]="formData().machine_ip"
-                (ngModelChange)="formData.update(f => ({ ...f, machine_ip: $event }))"
-                name="machine_ip"
-              />
+              <div class="ip-input-wrapper">
+                <input
+                  type="text"
+                  required
+                  class="font-mono"
+                  placeholder="192.55.55.5"
+                  maxlength="15"
+                  [value]="formData().machine_ip"
+                  (input)="onIpInput($event)"
+                  name="machine_ip"
+                />
+                @if (formData().machine_ip) {
+                  @if (isIpValid()) {
+                    <span class="ip-status-badge ip-valid" title="Valid IPv4 address">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </span>
+                  } @else {
+                    <span class="ip-status-badge ip-invalid" title="Incomplete or invalid IPv4 address">
+                      !
+                    </span>
+                  }
+                }
+              </div>
+              @if (formData().machine_ip && !isIpValid()) {
+                <span class="field-hint-error">Invalid IPv4 format. Expected: e.g. 192.55.55.5</span>
+              } @else {
+                <span class="field-hint">IPv4 format: 4 octets between 0 and 255 (e.g. 192.55.55.5)</span>
+              }
             </div>
 
             <div class="form-group">

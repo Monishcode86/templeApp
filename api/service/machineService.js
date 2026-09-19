@@ -2,6 +2,7 @@ const commonDao = require('../dao/commonDao');
 const logger = require('../config/logger');
 
 const SCHEMA_NAME = 'machines';
+const IPV4_REGEX = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
 /**
  * Add a new machine configuration
@@ -54,6 +55,13 @@ const addMachine = async (machineData) => {
         throw error;
     }
 
+    const trimmedIp = machine_ip.trim();
+    if (!IPV4_REGEX.test(trimmedIp)) {
+        const error = new Error('Invalid IP address format. Please enter a valid IPv4 address (e.g. 192.55.55.5).');
+        error.statusCode = 400;
+        throw error;
+    }
+
     if (!machine_liscence || !machine_liscence.trim()) {
         const error = new Error('Machine license is required.');
         error.statusCode = 400;
@@ -66,7 +74,6 @@ const addMachine = async (machineData) => {
     const trimmedDeptName = department_name.trim();
     const trimmedMachineType = machinetype.trim();
     const trimmedMachineTypeId = machinetype_id ? machinetype_id.trim() : '';
-    const trimmedIp = machine_ip.trim();
     const trimmedLicense = machine_liscence.trim();
 
     // Check unique IP in plant
@@ -210,6 +217,11 @@ const updateMachine = async (id, updateData) => {
 
     if (updateData.machine_ip && updateData.machine_ip.trim() !== existing.machine_ip) {
         const trimmedIp = updateData.machine_ip.trim();
+        if (!IPV4_REGEX.test(trimmedIp)) {
+            const error = new Error('Invalid IP address format. Please enter a valid IPv4 address (e.g. 192.55.55.5).');
+            error.statusCode = 400;
+            throw error;
+        }
         const duplicateIp = await commonDao.findOneData(
             {
                 query: {
