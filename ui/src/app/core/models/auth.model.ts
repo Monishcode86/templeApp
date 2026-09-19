@@ -125,7 +125,7 @@ export interface Machine {
   machinetype_id?: string;
   machine_id?: string; // M1, M2...
   machine_ip: string;
-  machine_liscence: string;
+  machine_liscence: number | string; // Timestamp in milliseconds (13-digit)
   createdAt?: string;
   updatedAt?: string;
 }

@@ -62,8 +62,22 @@ const addMachine = async (machineData) => {
         throw error;
     }
 
-    if (!machine_liscence || !machine_liscence.trim()) {
-        const error = new Error('Machine license is required.');
+    if (machine_liscence === undefined || machine_liscence === null || machine_liscence === '') {
+        const error = new Error('Machine license date is required.');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    let licenseTs = Number(machine_liscence);
+    if (isNaN(licenseTs)) {
+        const parsed = new Date(machine_liscence).getTime();
+        if (!isNaN(parsed)) {
+            licenseTs = parsed;
+        }
+    }
+
+    if (!licenseTs || isNaN(licenseTs)) {
+        const error = new Error('Please provide a valid machine license date.');
         error.statusCode = 400;
         throw error;
     }
@@ -74,7 +88,6 @@ const addMachine = async (machineData) => {
     const trimmedDeptName = department_name.trim();
     const trimmedMachineType = machinetype.trim();
     const trimmedMachineTypeId = machinetype_id ? machinetype_id.trim() : '';
-    const trimmedLicense = machine_liscence.trim();
 
     // Check unique IP in plant
     const existingIp = await commonDao.findOneData(
@@ -95,25 +108,6 @@ const addMachine = async (machineData) => {
         throw error;
     }
 
-    // Check unique license in plant
-    const existingLicense = await commonDao.findOneData(
-        {
-            query: {
-                plant_id: normalizedPlantId,
-                machine_liscence: trimmedLicense
-            }
-        },
-        SCHEMA_NAME
-    );
-
-    if (existingLicense) {
-        const error = new Error(
-            `Machine license '${trimmedLicense}' is already in use by machine '${existingLicense.machine_id}' in plant '${trimmedPlantName}'.`
-        );
-        error.statusCode = 409;
-        throw error;
-    }
-
     const docToCreate = {
         plant_id: normalizedPlantId,
         plant_name: trimmedPlantName,
@@ -122,7 +116,7 @@ const addMachine = async (machineData) => {
         machinetype: trimmedMachineType,
         machinetype_id: trimmedMachineTypeId,
         machine_ip: trimmedIp,
-        machine_liscence: trimmedLicense
+        machine_liscence: licenseTs
     };
 
     const newDoc = await commonDao.insertOne(docToCreate, SCHEMA_NAME);
@@ -154,10 +148,13 @@ const getAllMachines = async (params = {}) => {
             { machine_id: searchRegex },
             { machinetype: searchRegex },
             { machine_ip: searchRegex },
-            { machine_liscence: searchRegex },
             { department_name: searchRegex },
             { plant_name: searchRegex }
         ];
+        const numSearch = Number(params.search.trim());
+        if (!isNaN(numSearch) && numSearch > 0) {
+            query.$or.push({ machine_liscence: numSearch });
+        }
     }
 
     if (params.page || params.limit) {
@@ -243,27 +240,20 @@ const updateMachine = async (id, updateData) => {
         updateFields.machine_ip = trimmedIp;
     }
 
-    if (updateData.machine_liscence && updateData.machine_liscence.trim() !== existing.machine_liscence) {
-        const trimmedLicense = updateData.machine_liscence.trim();
-        const duplicateLicense = await commonDao.findOneData(
-            {
-                query: {
-                    _id: { $ne: id },
-                    plant_id: existing.plant_id,
-                    machine_liscence: trimmedLicense
-                }
-            },
-            SCHEMA_NAME
-        );
-
-        if (duplicateLicense) {
-            const error = new Error(
-                `Machine license '${trimmedLicense}' is already in use by machine '${duplicateLicense.machine_id}' in plant '${existing.plant_name}'.`
-            );
-            error.statusCode = 409;
+    if (updateData.machine_liscence !== undefined && updateData.machine_liscence !== null && updateData.machine_liscence !== '') {
+        let licenseTs = Number(updateData.machine_liscence);
+        if (isNaN(licenseTs)) {
+            const parsed = new Date(updateData.machine_liscence).getTime();
+            if (!isNaN(parsed)) {
+                licenseTs = parsed;
+            }
+        }
+        if (!licenseTs || isNaN(licenseTs)) {
+            const error = new Error('Please provide a valid machine license date.');
+            error.statusCode = 400;
             throw error;
         }
-        updateFields.machine_liscence = trimmedLicense;
+        updateFields.machine_liscence = licenseTs;
     }
 
     await commonDao.updateOne(

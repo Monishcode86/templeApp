@@ -215,6 +215,24 @@ export class MachinesComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Helper to format 13-digit millisecond timestamp to YYYY-MM-DD for date input
+  formatTimestampToDateInput(ts: number | string | undefined): string {
+    if (!ts) return '';
+    const num = Number(ts);
+    if (isNaN(num)) return '';
+    const date = new Date(num);
+    if (isNaN(date.getTime())) return '';
+    return date.toISOString().split('T')[0];
+  }
+
+  // Get current timestamp in milliseconds from date input
+  getLicenseTimestamp(): number | null {
+    const val = this.formData().machine_liscence;
+    if (!val) return null;
+    const time = new Date(val).getTime();
+    return isNaN(time) ? null : time;
+  }
+
   // Open Add Modal
   openAddModal(): void {
     this.isEditMode.set(false);
@@ -225,6 +243,9 @@ export class MachinesComponent implements OnInit, OnDestroy {
     const defaultPlantId = this.filterPlantId() || defaultPlant?.plant_id || '';
     const activePlant = this.plantsList().find((p) => p.plant_id === defaultPlantId) || defaultPlant;
 
+    // Default license date to today (or empty)
+    const todayDate = new Date().toISOString().split('T')[0];
+
     this.formData.set({
       plant_id: defaultPlantId,
       plant_name: activePlant?.plant_name || '',
@@ -233,7 +254,7 @@ export class MachinesComponent implements OnInit, OnDestroy {
       machinetype: '',
       machinetype_id: '',
       machine_ip: '',
-      machine_liscence: ''
+      machine_liscence: todayDate
     });
 
     if (defaultPlantId) {
@@ -270,7 +291,7 @@ export class MachinesComponent implements OnInit, OnDestroy {
       machinetype_id: item.machinetype_id || '',
       machine_id: item.machine_id,
       machine_ip: item.machine_ip,
-      machine_liscence: item.machine_liscence
+      machine_liscence: this.formatTimestampToDateInput(item.machine_liscence)
     });
 
     this.loadPlantRelatedOptions(item.plant_id);
@@ -429,8 +450,14 @@ export class MachinesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!form.machine_liscence || !form.machine_liscence.trim()) {
-      this.modalError.set('Machine license is required.');
+    if (!form.machine_liscence) {
+      this.modalError.set('Machine license date is required.');
+      return;
+    }
+
+    const licenseTimestamp = new Date(form.machine_liscence).getTime();
+    if (isNaN(licenseTimestamp)) {
+      this.modalError.set('Please select a valid machine license date.');
       return;
     }
 
@@ -444,7 +471,7 @@ export class MachinesComponent implements OnInit, OnDestroy {
       machinetype: form.machinetype.trim(),
       machinetype_id: form.machinetype_id ? form.machinetype_id.trim() : '',
       machine_ip: form.machine_ip.trim(),
-      machine_liscence: form.machine_liscence.trim()
+      machine_liscence: licenseTimestamp
     };
 
     if (this.isEditMode() && form.id) {

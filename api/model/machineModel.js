@@ -47,9 +47,8 @@ const machineSchema = new mongoose.Schema(
             ]
         },
         machine_liscence: {
-            type: String,
-            required: [true, 'Machine license is required'],
-            trim: true
+            type: Number,
+            required: [true, 'Machine license timestamp is required']
         }
     },
     {
@@ -86,7 +85,6 @@ machineSchema.pre('save', async function () {
 // Compound unique indexes
 machineSchema.index({ plant_id: 1, machine_id: 1 }, { unique: true });
 machineSchema.index({ plant_id: 1, machine_ip: 1 }, { unique: true });
-machineSchema.index({ plant_id: 1, machine_liscence: 1 }, { unique: true });
 machineSchema.index({ plant_id: 1 });
 machineSchema.index({ plant_id: 1, department_id: 1 });
 
