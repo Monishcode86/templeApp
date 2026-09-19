@@ -37,6 +37,26 @@ export interface Shift {
   updatedAt?: string;
 }
 
+export interface DepartmentShift {
+  shift_id: number;
+  shift_name: string;
+  start_time: string;
+  end_time: string;
+  duration?: string;
+}
+
+export interface Department {
+  _id?: string;
+  department_id?: string;
+  department_name: string;
+  plant_id: string;
+  plant_name: string;
+  is_shift: boolean;
+  shift_data: DepartmentShift[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;

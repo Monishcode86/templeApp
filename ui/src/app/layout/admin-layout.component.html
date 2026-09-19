@@ -198,6 +198,32 @@
               </div>
               <span class="nav-sublabel">{{ 'NAV_SHIFTS' | translate }}</span>
             </a>
+
+            <a
+              routerLink="/departments"
+              routerLinkActive="active"
+              (click)="closeMobileSidebar()"
+              class="nav-subitem"
+            >
+              <div class="nav-subicon">
+                <svg
+                  width="17"
+                  height="17"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+                  <path d="M8 10v4"></path>
+                  <path d="M12 10v4"></path>
+                  <path d="M16 10v4"></path>
+                </svg>
+              </div>
+              <span class="nav-sublabel">{{ 'NAV_DEPARTMENTS' | translate }}</span>
+            </a>
           </div>
         }
       </div>
@@ -399,6 +425,33 @@
                 <div class="item-content">
                   <span class="item-title">{{ 'NAV_SHIFTS' | translate }}</span>
                   <span class="item-desc">Work shifts &amp; plant timing schedules</span>
+                </div>
+              </a>
+
+              <a
+                routerLink="/departments"
+                routerLinkActive="active"
+                (click)="closeConfigDropdown()"
+                class="dropdown-item config-dropdown-item"
+              >
+                <div class="item-icon-box">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+                    <path d="M8 10v4"></path>
+                    <path d="M12 10v4"></path>
+                    <path d="M16 10v4"></path>
+                  </svg>
+                </div>
+                <div class="item-content">
+                  <span class="item-title">{{ 'NAV_DEPARTMENTS' | translate }}</span>
+                  <span class="item-desc">Department units &amp; shift schedules</span>
                 </div>
               </a>
             </div>

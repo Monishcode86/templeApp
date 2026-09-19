@@ -1,0 +1,518 @@
+<div class="page-container">
+  <!-- Alerts -->
+  @if (successMessage()) {
+    <div class="alert alert-success">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <span>{{ successMessage() }}</span>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert alert-error">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+          <path d="M8 10v4"></path>
+          <path d="M12 10v4"></path>
+          <path d="M16 10v4"></path>
+        </svg>
+      </div>
+      <div>
+        <h1 class="page-title">Department Configuration</h1>
+        <p class="page-description">Configure departments, associate with plants, and assign plant or custom 24-hour shift schedules.</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn btn-primary" (click)="openAddModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Add Department</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter & Search Toolbar -->
+  <div class="toolbar-card">
+    <div class="toolbar-left-group">
+      <!-- Search Input -->
+      <div class="search-input-wrapper">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by department name, ID, or plant..."
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchChange($event)" />
+        @if (searchQuery()) {
+          <button type="button" class="clear-search-btn" (click)="clearSearch()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        }
+      </div>
+
+      <!-- Plant Filter Dropdown -->
+      <div class="plant-filter-dropdown">
+        <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M2 20V10l5-3v3l5-3v3l5-3v13H2z"></path>
+        </svg>
+        <select
+          class="filter-select"
+          [ngModel]="filterPlantId()"
+          (ngModelChange)="onFilterPlantChange($event)">
+          @if (plantsList().length === 0) {
+            <option value="">-- No Plants Configured --</option>
+          } @else {
+            @for (plant of plantsList(); track plant.plant_id) {
+              <option [value]="plant.plant_id">{{ plant.plant_name }} ({{ plant.plant_id }})</option>
+            }
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="toolbar-stats">
+      <span>Showing <strong>{{ departmentsList().length }}</strong> of {{ totalCount() }} departments</span>
+    </div>
+  </div>
+
+  <!-- Departments Data Table -->
+  <div class="panel-card">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Dept ID</th>
+            <th>Department Name</th>
+            <th>Plant</th>
+            <th>Shift Mode</th>
+            <th>Configured Shifts</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (isLoading()) {
+            <tr>
+              <td colspan="6" class="empty-cell">
+                <div class="empty-state-content">
+                  <div class="loading-spinner"></div>
+                  <p>Loading departments...</p>
+                </div>
+              </td>
+            </tr>
+          } @else if (departmentsList().length === 0) {
+            <tr>
+              <td colspan="6" class="empty-cell">
+                <div class="empty-state-content">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon">
+                    <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+                  </svg>
+                  <p>No departments found. Click "Add Department" to get started.</p>
+                </div>
+              </td>
+            </tr>
+          } @else {
+            @for (dept of departmentsList(); track dept._id) {
+              <tr>
+                <td>
+                  <span class="dept-id-badge">{{ dept.department_id }}</span>
+                </td>
+                <td>
+                  <span class="cell-primary font-medium">{{ dept.department_name }}</span>
+                </td>
+                <td>
+                  <div class="plant-cell">
+                    <div class="plant-icon-box">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 20V10l5-3v3l5-3v3l5-3v13H2z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <span class="cell-primary">{{ dept.plant_name }}</span>
+                      <span class="plant-code-badge" style="margin-left:0.4rem; font-size:0.7rem;">{{ dept.plant_id }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  @if (dept.is_shift) {
+                    <span class="badge badge-plant-shift">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      Plant Shifts
+                    </span>
+                  } @else {
+                    <span class="badge badge-custom-shift">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                      Custom Shifts (24h)
+                    </span>
+                  }
+                </td>
+                <td>
+                  <div class="shift-pills-wrap">
+                    @if (dept.shift_data && dept.shift_data.length > 0) {
+                      @for (s of dept.shift_data; track s.shift_id) {
+                        <span class="shift-pill" title="{{ s.shift_name }}: {{ s.start_time }} to {{ s.end_time }}">
+                          <strong>#{{ s.shift_id }} {{ s.shift_name }}</strong>: {{ s.start_time }} &ndash; {{ s.end_time }}
+                          <span class="pill-duration">{{ s.duration }}</span>
+                        </span>
+                      }
+                    } @else {
+                      <span class="cell-muted font-sm">No shifts configured</span>
+                    }
+                  </div>
+                </td>
+                <td class="text-right">
+                  <div class="action-buttons">
+                    <button type="button" class="action-btn edit-btn" (click)="openEditModal(dept)" title="Edit Department">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                      <span class="btn-text">Edit</span>
+                    </button>
+                    <button type="button" class="action-btn delete-btn" (click)="confirmDelete(dept)" title="Delete Department">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                      <span class="btn-text">Delete</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination
+      [total]="totalCount()"
+      [page]="currentPage()"
+      [limit]="pageSize()"
+      [pageSizeOptions]="[5, 10, 25, 50]"
+      (pageChange)="onPageChange($event)"
+      (limitChange)="onLimitChange($event)">
+    </app-pagination>
+  </div>
+
+  <!-- Create / Edit Department Modal -->
+  @if (isModalOpen()) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal-card modal-lg" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3 class="modal-title">{{ isEditMode() ? 'Edit Department' : 'Create Department' }}</h3>
+          <button class="icon-btn close-modal" (click)="closeModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        @if (modalError()) {
+          <div class="modal-error-alert">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>{{ modalError() }}</span>
+          </div>
+        }
+
+        <form (ngSubmit)="saveDepartment()" class="modal-form">
+          <!-- Department ID note -->
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Department ID <span class="label-note">(Auto-generated with prefix "Dep-")</span></label>
+              <input
+                type="text"
+                disabled
+                [value]="isEditMode() ? (editingDepartment()?.department_id || 'Dep-...') : 'Dep- (auto on save)'"
+                class="input-readonly" />
+            </div>
+
+            <div class="form-group">
+              <label>Plant * @if (isEditMode()) { <span class="label-note">(locked)</span> }</label>
+              <div class="select-wrapper">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M2 20V10l5-3v3l5-3v3l5-3v13H2z"></path>
+                </svg>
+                <select
+                  required
+                  [disabled]="isEditMode()"
+                  [class.input-readonly]="isEditMode()"
+                  [ngModel]="formData().plant_id"
+                  (ngModelChange)="onPlantSelect($event)"
+                  name="plant_id">
+                  <option value="">-- Select Plant --</option>
+                  @for (plant of plantsList(); track plant.plant_id) {
+                    <option [value]="plant.plant_id">{{ plant.plant_name }} ({{ plant.plant_id }})</option>
+                  }
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Department Name *</label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. Quality Control, Assembly Line, Maintenance"
+              [ngModel]="formData().department_name"
+              (ngModelChange)="formData.update(f => ({ ...f, department_name: $event }))"
+              name="department_name" />
+          </div>
+
+          <!-- Shift Configuration Selection -->
+          <div class="shift-config-section">
+            <label class="section-title">Shift Schedule Configuration</label>
+            <p class="section-desc">Choose whether this department uses the plant's standard shifts or has dedicated custom shifts.</p>
+
+            <div class="shift-mode-cards">
+              <!-- Option 1: Plant Shifts -->
+              <div
+                class="mode-card"
+                [class.selected]="formData().is_shift"
+                (click)="setShiftMode(true)">
+                <div class="mode-card-header">
+                  <div class="custom-radio" [class.checked]="formData().is_shift"></div>
+                  <div>
+                    <h4 class="mode-card-title">Respective Plant Shifts</h4>
+                    <p class="mode-card-subtitle">Automatically inherit and store the selected plant's configured shifts</p>
+                  </div>
+                </div>
+
+                @if (formData().is_shift) {
+                  <div class="mode-preview-box">
+                    @if (isLoadingPlantShifts()) {
+                      <div class="preview-loading">
+                        <div class="loading-spinner"></div>
+                        <span>Loading plant shifts...</span>
+                      </div>
+                    } @else if (plantShiftsPreview().length > 0) {
+                      <div class="plant-shifts-preview-list">
+                        <span class="preview-tag">Inherited Shifts ({{ plantShiftsPreview().length }}):</span>
+                        @for (s of plantShiftsPreview(); track s.shift_id) {
+                          <div class="preview-shift-item">
+                            <span class="preview-shift-name">#{{ s.shift_id }} {{ s.shift_name }}</span>
+                            <span class="preview-shift-time">{{ s.start_time }} &ndash; {{ s.end_time }}</span>
+                          </div>
+                        }
+                      </div>
+                    } @else {
+                      <div class="preview-empty">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" y1="8" x2="12" y2="12"></line>
+                          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <span>No shifts configured for this plant yet. Please add shifts in Shift Configuration or select Custom Shifts below.</span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+
+              <!-- Option 2: Custom Department Shifts -->
+              <div
+                class="mode-card"
+                [class.selected]="!formData().is_shift"
+                (click)="setShiftMode(false)">
+                <div class="mode-card-header">
+                  <div class="custom-radio" [class.checked]="!formData().is_shift"></div>
+                  <div>
+                    <h4 class="mode-card-title">Custom Department Shifts</h4>
+                    <p class="mode-card-subtitle">Configure dedicated shifts (1, 2, 3...) that must complete a full 24-hour cycle</p>
+                  </div>
+                </div>
+
+                @if (!formData().is_shift) {
+                  <div class="custom-builder-container" (click)="$event.stopPropagation()">
+                    <!-- Capacity indicator -->
+                    <div class="capacity-bar-wrapper" [class.capacity-full]="isCustom24HoursComplete()">
+                      <div class="capacity-bar-labels">
+                        <span class="capacity-label">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                          </svg>
+                          24-Hour Cycle
+                        </span>
+                        <span class="capacity-value" [class.capacity-zero]="isCustom24HoursComplete()">
+                          {{ isCustom24HoursComplete() ? 'Complete (24h allocated)' : formatSeconds(customRemainingSeconds()) + ' remaining to complete 24h' }}
+                        </span>
+                      </div>
+                      <div class="capacity-track">
+                        <div
+                          class="capacity-fill"
+                          [style.width.%]="customAllocatedPercent()"
+                          [class.capacity-fill-warn]="customAllocatedPercent() > 0 && customAllocatedPercent() < 100"
+                          [class.capacity-fill-full]="isCustom24HoursComplete()">
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Custom shifts list -->
+                    <div class="custom-shifts-list">
+                      @for (s of customShifts(); track s.shift_id; let i = $index) {
+                        <div class="custom-shift-row">
+                          <span class="shift-idx-badge">#{{ i + 1 }}</span>
+
+                          <div class="shift-input-col name-col">
+                            <label class="font-xs">Shift Name *</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="e.g. Morning Shift"
+                              [(ngModel)]="s.shift_name"
+                              name="c_shift_name_{{ i }}" />
+                          </div>
+
+                          <div class="shift-input-col time-col">
+                            <label class="font-xs">Start Time (hh:mm:ss)</label>
+                            <input
+                              type="time"
+                              step="1"
+                              required
+                              [disabled]="i > 0"
+                              [class.input-readonly]="i > 0"
+                              [(ngModel)]="s.start_time"
+                              (ngModelChange)="onCustomShiftChange(i)"
+                              name="c_start_time_{{ i }}" />
+                          </div>
+
+                          <div class="shift-input-col time-col">
+                            <label class="font-xs">End Time (hh:mm:ss)</label>
+                            <input
+                              type="time"
+                              step="1"
+                              required
+                              [(ngModel)]="s.end_time"
+                              (ngModelChange)="onCustomShiftChange(i)"
+                              name="c_end_time_{{ i }}" />
+                          </div>
+
+                          <div class="shift-duration-col">
+                            <label class="font-xs">Duration</label>
+                            <span class="custom-dur-badge">{{ s.duration || calcDuration(s.start_time, s.end_time) }}</span>
+                          </div>
+
+                          <!-- Delete button on last item only -->
+                          @if (i === customShifts().length - 1 && customShifts().length > 1) {
+                            <div class="shift-del-col">
+                              <button
+                                type="button"
+                                class="action-btn delete-btn"
+                                (click)="removeLastCustomShift()"
+                                title="Remove this shift">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                  <polyline points="3 6 5 6 21 6"></polyline>
+                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                              </button>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Add Shift Button -->
+                    @if (!isCustom24HoursComplete()) {
+                      <div class="builder-actions">
+                        <button
+                          type="button"
+                          class="btn btn-secondary btn-sm"
+                          (click)="addCustomShift()">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                          </svg>
+                          <span>Add Shift #{{ customShifts().length + 1 }}</span>
+                        </button>
+                        <span class="builder-hint">Chain shifts until the 24-hour cycle is reached</span>
+                      </div>
+                    } @else {
+                      <div class="builder-complete-banner">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>Full 24-hour schedule successfully configured across {{ customShifts().length }} shift(s).</span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="isLoading() || (!formData().is_shift && !isCustom24HoursComplete())">
+              {{ isEditMode() ? 'Save Changes' : 'Create Department' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Delete Confirmation Modal -->
+  @if (isDeleteConfirmOpen()) {
+    <div class="modal-overlay" (click)="cancelDelete()">
+      <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3 class="modal-title">Delete Department</h3>
+          <button class="icon-btn close-modal" (click)="cancelDelete()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete this department? This action cannot be undone.</p>
+          <div class="delete-target-box">
+            <strong>{{ departmentToDelete()?.department_name }}</strong>
+            <span class="cell-muted"> &mdash; {{ departmentToDelete()?.department_id }} ({{ departmentToDelete()?.plant_name }})</span>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
+          <button type="button" class="btn btn-danger" [disabled]="isLoading()" (click)="executeDelete()">Delete Department</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

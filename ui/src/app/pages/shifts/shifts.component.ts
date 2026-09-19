@@ -4,14 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
 import { ShiftService } from '../../core/services/shift.service';
 import { PlantService } from '../../core/services/plant.service';
-import { TranslatePipe } from '../../core/services/translation.service';
 import { Shift, Plant } from '../../core/models/auth.model';
 import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
 
 @Component({
   selector: 'app-shifts',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe, PaginationComponent],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: './shifts.component.html',
   styleUrls: ['./shifts.component.css']
 })
