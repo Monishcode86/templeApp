@@ -57,6 +57,33 @@ export interface Department {
   updatedAt?: string;
 }
 
+export interface PartOperation {
+  operation_name: string;
+  run_time: number;
+  load_time: number;
+  unload_time: number;
+  cycle_type: 'part_per_cycle' | 'unit_per_parts';
+  count: number;
+}
+
+export interface PartMaster {
+  _id?: string;
+  part_id?: string;
+  program_number: string;
+  part_name: string;
+  plant_id: string;
+  plant_name: string;
+  has_operation: boolean;
+  run_time?: number;
+  load_time?: number;
+  unload_time?: number;
+  cycle_type?: 'part_per_cycle' | 'unit_per_parts';
+  count?: number;
+  operations?: PartOperation[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;

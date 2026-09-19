@@ -2,6 +2,7 @@ const UserModel = require('../model/userModel');
 const PlantModel = require('../model/plantModel');
 const ShiftModel = require('../model/shiftModel');
 const DepartmentModel = require('../model/departmentModel');
+const PartModel = require('../model/partModel');
 
 const schema = {
     users: UserModel,
@@ -15,7 +16,10 @@ const schema = {
     ShiftModel: ShiftModel,
     departments: DepartmentModel,
     department: DepartmentModel,
-    DepartmentModel: DepartmentModel
+    DepartmentModel: DepartmentModel,
+    parts: PartModel,
+    part: PartModel,
+    PartModel: PartModel
 };
 
 module.exports = schema;

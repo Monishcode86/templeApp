@@ -1,0 +1,670 @@
+<div class="config-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-titles">
+      <h1 class="page-title">{{ 'PARTS_HEADING' | translate }}</h1>
+      <p class="page-subtitle">{{ 'PARTS_SUBHEADING' | translate }}</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary create-btn" (click)="openAddModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>{{ 'ADD_PART_BTN' | translate }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast / Alerts -->
+  @if (successMessage()) {
+    <div class="toast-alert toast-success">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <span>{{ successMessage() }}</span>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="toast-alert toast-error">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <!-- Filter & Search Toolbar -->
+  <div class="toolbar-card">
+    <div class="toolbar-left-group">
+      <!-- Search Input -->
+      <div class="search-input-wrapper">
+        <svg
+          class="search-icon"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="text"
+          [placeholder]="'SEARCH_PARTS_PLACEHOLDER' | translate"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchChange($event)"
+        />
+        @if (searchQuery()) {
+          <button type="button" class="clear-search-btn" (click)="clearSearch()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        }
+      </div>
+
+      <!-- Plant Filter Dropdown -->
+      <div class="plant-filter-dropdown" title="Filter by Plant">
+        <svg class="plant-select-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M2 20V10l5-3v3l5-3v3l5-3v13H2z"></path>
+        </svg>
+        <select
+          class="filter-select"
+          [ngModel]="filterPlantId()"
+          (ngModelChange)="onFilterPlantChange($event)"
+        >
+          @if (plantsList().length === 0) {
+            <option value="">-- No Plants Configured --</option>
+          } @else {
+            @for (plant of plantsList(); track plant.plant_id) {
+              <option [value]="plant.plant_id">
+                {{ plant.plant_name }} ({{ plant.plant_id }})
+              </option>
+            }
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="toolbar-stats">
+      <span>
+        Showing <strong>{{ partsList().length }}</strong> of {{ totalCount() }} parts
+      </span>
+    </div>
+  </div>
+
+  <!-- Parts Data Table -->
+  <div class="panel-card">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>{{ 'COL_PART_ID' | translate }}</th>
+            <th>{{ 'COL_PROGRAM_NO' | translate }}</th>
+            <th>{{ 'COL_PART_NAME' | translate }}</th>
+            <th>{{ 'COL_PLANT' | translate }}</th>
+            <th>{{ 'LABEL_HAS_OPERATION' | translate }}</th>
+            <th>Cycle Metrics &amp; Details</th>
+            <th class="text-right">{{ 'COL_ACTIONS' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (isLoading()) {
+            <tr>
+              <td colspan="7" class="empty-cell">
+                <div class="empty-state-content">
+                  <div class="loading-spinner"></div>
+                  <p>Loading parts...</p>
+                </div>
+              </td>
+            </tr>
+          } @else if (partsList().length === 0) {
+            <tr>
+              <td colspan="7" class="empty-cell">
+                <div class="empty-state-content">
+                  <svg
+                    width="40"
+                    height="40"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    class="empty-icon"
+                  >
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                  </svg>
+                  <p>{{ 'NO_PARTS_FOUND' | translate }}</p>
+                </div>
+              </td>
+            </tr>
+          } @else {
+            @for (part of partsList(); track part._id) {
+              <tr>
+                <td>
+                  <span class="part-id-badge">{{ part.part_id }}</span>
+                </td>
+                <td>
+                  <span class="program-no-badge">{{ part.program_number }}</span>
+                </td>
+                <td>
+                  <span class="cell-primary font-medium">{{ part.part_name }}</span>
+                </td>
+                <td>
+                  <div class="plant-cell">
+                    <div class="plant-icon-box">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 20V10l5-3v3l5-3v3l5-3v13H2z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <span class="cell-primary">{{ part.plant_name }}</span>
+                      <span class="plant-code-badge" style="margin-left: 0.4rem; font-size: 0.7rem">{{ part.plant_id }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  @if (part.has_operation) {
+                    <span class="badge badge-multi-op">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                      </svg>
+                      Multi-Op ({{ part.operations?.length || 0 }})
+                    </span>
+                  } @else {
+                    <span class="badge badge-single-proc">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                      </svg>
+                      Single Process
+                    </span>
+                  }
+                </td>
+                <td>
+                  @if (part.has_operation) {
+                    <div class="op-pills-wrap">
+                      @for (op of (part.operations || []); track op.operation_name) {
+                        <div class="op-pill" title="Run: {{ op.run_time }}ms, Load: {{ op.load_time }}ms, Unload: {{ op.unload_time }}ms">
+                          <span class="op-tag">{{ op.operation_name }}</span>
+                          <span class="op-metrics">
+                            <span class="metric-r" title="Run Time">R:{{ op.run_time }}ms</span>
+                            <span class="metric-l" title="Load Time">L:{{ op.load_time }}ms</span>
+                            <span class="metric-u" title="Unload Time">U:{{ op.unload_time }}ms</span>
+                          </span>
+                          <span class="op-cycle-pill" [class.unit-parts]="op.cycle_type === 'unit_per_parts'">
+                            {{ op.cycle_type === 'unit_per_parts' ? 'Unit/Part' : 'Part/Cyc' }} &times;{{ op.count }}
+                          </span>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="single-metrics-wrap">
+                      <div class="metric-chip chip-run">
+                        <span class="metric-lbl">Run:</span>
+                        <span class="metric-val">{{ part.run_time || 0 }} ms</span>
+                      </div>
+                      <div class="metric-chip chip-load">
+                        <span class="metric-lbl">Load:</span>
+                        <span class="metric-val">{{ part.load_time || 0 }} ms</span>
+                      </div>
+                      <div class="metric-chip chip-unload">
+                        <span class="metric-lbl">Unload:</span>
+                        <span class="metric-val">{{ part.unload_time || 0 }} ms</span>
+                      </div>
+                      <div class="metric-chip chip-cycle" [class.unit-parts]="part.cycle_type === 'unit_per_parts'">
+                        <span class="metric-lbl">Type:</span>
+                        <span class="metric-val">
+                          {{ part.cycle_type === 'unit_per_parts' ? 'Unit/Parts' : 'Part/Cycle' }} &times;{{ part.count || 1 }}
+                        </span>
+                      </div>
+                    </div>
+                  }
+                </td>
+                <td class="text-right">
+                  <div class="action-buttons">
+                    <button
+                      type="button"
+                      class="action-btn edit-btn"
+                      (click)="openEditModal(part)"
+                      [title]="'EDIT_PART_TITLE' | translate"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                      <span class="btn-text">{{ 'EDIT' | translate }}</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="action-btn delete-btn"
+                      (click)="openDeleteConfirm(part)"
+                      [title]="'DELETE_PART_TITLE' | translate"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                      <span class="btn-text">{{ 'DELETE' | translate }}</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (partsList().length > 0) {
+      <app-pagination
+        [total]="totalCount()"
+        [page]="currentPage()"
+        [limit]="pageSize()"
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        (pageChange)="onPageChange($event)"
+        (limitChange)="onLimitChange($event)"
+      >
+      </app-pagination>
+    }
+  </div>
+</div>
+
+<!-- Add / Edit Modal -->
+@if (isModalOpen()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-card modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title">
+              {{ (isEditMode() ? 'EDIT_PART_TITLE' : 'ADD_PART_TITLE') | translate }}
+            </h3>
+            <p class="modal-subtitle">
+              @if (isEditMode()) {
+                Updating part <strong>{{ formData().part_id }}</strong> ({{ formData().plant_name }})
+              } @else {
+                Configure part parameters and timing operations
+              }
+            </p>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" (click)="closeModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Error Alert -->
+      @if (modalError()) {
+        <div class="modal-alert modal-alert-error">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>{{ modalError() }}</span>
+        </div>
+      }
+
+      <div class="modal-body">
+        <!-- Plant Selector -->
+        <div class="form-group">
+          <label class="form-label"
+            >{{ 'COL_PLANT' | translate }} <span class="required">*</span></label
+          >
+          <div class="input-icon-wrapper">
+            <svg class="input-left-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2 20V10l5-3v3l5-3v3l5-3v13H2z"></path>
+            </svg>
+            <select
+              class="form-select with-icon"
+              [ngModel]="formData().plant_id"
+              (ngModelChange)="onPlantSelectChange($event)"
+              [disabled]="isEditMode()"
+            >
+              <option value="" disabled>{{ 'SELECT_PLANT' | translate }}</option>
+              @for (plant of plantsList(); track plant.plant_id) {
+                <option [value]="plant.plant_id">
+                  {{ plant.plant_name }} ({{ plant.plant_id }})
+                </option>
+              }
+            </select>
+          </div>
+          @if (isEditMode()) {
+            <span class="field-hint">Plant association cannot be changed once created.</span>
+          }
+        </div>
+
+        <!-- Program Number & Part Name in 2 columns -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">
+              {{ 'LABEL_PROGRAM_NO' | translate }} <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              class="form-input font-mono"
+              placeholder="e.g. PRG-01/A, #102_B"
+              [ngModel]="formData().program_number"
+              (ngModelChange)="formData().program_number = $event"
+            />
+            <span class="field-hint">{{ 'LABEL_PROGRAM_NO_HINT' | translate }}</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              {{ 'LABEL_PART_NAME' | translate }} <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              class="form-input"
+              placeholder="e.g. Rotor Housing Assembly"
+              [ngModel]="formData().part_name"
+              (ngModelChange)="formData().part_name = $event"
+            />
+          </div>
+        </div>
+
+        <!-- Operation Mode Selection (has_operation: true vs false) -->
+        <div class="form-group">
+          <label class="form-label">{{ 'LABEL_HAS_OPERATION' | translate }}</label>
+          <div class="mode-selector-cards">
+            <div
+              class="mode-card"
+              [class.active]="!formData().has_operation"
+              (click)="setHasOperation(false)"
+            >
+              <div class="mode-radio">
+                <div class="radio-circle" [class.checked]="!formData().has_operation"></div>
+              </div>
+              <div class="mode-info">
+                <div class="mode-title-row">
+                  <span class="mode-title">{{ 'HAS_OPERATION_NO' | translate }}</span>
+                  <span class="mode-badge badge-single">Default</span>
+                </div>
+                <p class="mode-desc">{{ 'HAS_OPERATION_NO_DESC' | translate }}</p>
+              </div>
+            </div>
+
+            <div
+              class="mode-card"
+              [class.active]="formData().has_operation"
+              (click)="setHasOperation(true)"
+            >
+              <div class="mode-radio">
+                <div class="radio-circle" [class.checked]="formData().has_operation"></div>
+              </div>
+              <div class="mode-info">
+                <div class="mode-title-row">
+                  <span class="mode-title">{{ 'HAS_OPERATION_YES' | translate }}</span>
+                  <span class="mode-badge badge-multi">Multi-Step</span>
+                </div>
+                <p class="mode-desc">{{ 'HAS_OPERATION_YES_DESC' | translate }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode A: Single Process Direct Inputs (when has_operation === false) -->
+        @if (!formData().has_operation) {
+          <div class="single-process-section">
+            <div class="section-badge-bar">
+              <span class="section-title">Single Process Cycle Parameters</span>
+            </div>
+
+            <div class="timing-grid">
+              <div class="timing-card">
+                <label class="timing-label">{{ 'COL_RUN_TIME' | translate }} <span class="unit-tag">millisec</span></label>
+                <div class="timing-input-wrap">
+                  <input
+                    type="number"
+                    min="0"
+                    class="form-input font-mono"
+                    [ngModel]="formData().run_time"
+                    (ngModelChange)="formData().run_time = $event"
+                  />
+                  <span class="unit-suffix">ms</span>
+                </div>
+              </div>
+
+              <div class="timing-card">
+                <label class="timing-label">{{ 'COL_LOAD_TIME' | translate }} <span class="unit-tag">millisec</span></label>
+                <div class="timing-input-wrap">
+                  <input
+                    type="number"
+                    min="0"
+                    class="form-input font-mono"
+                    [ngModel]="formData().load_time"
+                    (ngModelChange)="formData().load_time = $event"
+                  />
+                  <span class="unit-suffix">ms</span>
+                </div>
+              </div>
+
+              <div class="timing-card">
+                <label class="timing-label">{{ 'COL_UNLOAD_TIME' | translate }} <span class="unit-tag">millisec</span></label>
+                <div class="timing-input-wrap">
+                  <input
+                    type="number"
+                    min="0"
+                    class="form-input font-mono"
+                    [ngModel]="formData().unload_time"
+                    (ngModelChange)="formData().unload_time = $event"
+                  />
+                  <span class="unit-suffix">ms</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row-2" style="margin-top: 1rem">
+              <div class="form-group">
+                <label class="form-label">{{ 'COL_CYCLE_TYPE' | translate }}</label>
+                <select
+                  class="form-select"
+                  [ngModel]="formData().cycle_type"
+                  (ngModelChange)="formData().cycle_type = $event"
+                >
+                  <option value="part_per_cycle">{{ 'CYCLE_PART_PER_CYCLE' | translate }}</option>
+                  <option value="unit_per_parts">{{ 'CYCLE_UNIT_PER_PARTS' | translate }}</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">{{ 'COL_COUNT' | translate }}</label>
+                <input
+                  type="number"
+                  min="1"
+                  class="form-input font-mono"
+                  [ngModel]="formData().count"
+                  (ngModelChange)="formData().count = $event"
+                />
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Mode B: Multi-Operation Builder (when has_operation === true) -->
+        @if (formData().has_operation) {
+          <div class="multi-op-section">
+            <div class="builder-header">
+              <div class="builder-titles">
+                <h4 class="builder-title">{{ 'OPERATIONS_BUILDER' | translate }}</h4>
+                <p class="builder-subtitle">Configure sequential operations for program {{ formData().program_number || '(New)' }}</p>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm add-op-btn" (click)="addOperation()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>{{ 'ADD_OPERATION_BTN' | translate }}</span>
+              </button>
+            </div>
+
+            <div class="op-table-responsive">
+              <table class="op-builder-table">
+                <thead>
+                  <tr>
+                    <th style="width: 40px">#</th>
+                    <th>{{ 'OPERATION_NAME' | translate }}</th>
+                    <th>{{ 'COL_RUN_TIME' | translate }}</th>
+                    <th>{{ 'COL_LOAD_TIME' | translate }}</th>
+                    <th>{{ 'COL_UNLOAD_TIME' | translate }}</th>
+                    <th>{{ 'COL_CYCLE_TYPE' | translate }}</th>
+                    <th style="width: 80px">{{ 'COL_COUNT' | translate }}</th>
+                    <th style="width: 50px; text-align: center">Del</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (op of operations(); track $index) {
+                    <tr>
+                      <td class="op-index-cell">{{ $index + 1 }}</td>
+                      <td>
+                        <input
+                          type="text"
+                          class="form-input form-input-sm font-mono"
+                          [placeholder]="'OPERATION_NAME_PLACEHOLDER' | translate"
+                          [ngModel]="op.operation_name"
+                          (ngModelChange)="op.operation_name = $event"
+                        />
+                      </td>
+                      <td>
+                        <div class="op-num-wrap">
+                          <input
+                            type="number"
+                            min="0"
+                            class="form-input form-input-sm font-mono"
+                            [ngModel]="op.run_time"
+                            (ngModelChange)="op.run_time = $event"
+                          />
+                          <span class="num-unit">ms</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="op-num-wrap">
+                          <input
+                            type="number"
+                            min="0"
+                            class="form-input form-input-sm font-mono"
+                            [ngModel]="op.load_time"
+                            (ngModelChange)="op.load_time = $event"
+                          />
+                          <span class="num-unit">ms</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="op-num-wrap">
+                          <input
+                            type="number"
+                            min="0"
+                            class="form-input form-input-sm font-mono"
+                            [ngModel]="op.unload_time"
+                            (ngModelChange)="op.unload_time = $event"
+                          />
+                          <span class="num-unit">ms</span>
+                        </div>
+                      </td>
+                      <td>
+                        <select
+                          class="form-select form-select-sm"
+                          [ngModel]="op.cycle_type"
+                          (ngModelChange)="op.cycle_type = $event"
+                        >
+                          <option value="part_per_cycle">Part/Cyc</option>
+                          <option value="unit_per_parts">Unit/Part</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          min="1"
+                          class="form-input form-input-sm font-mono"
+                          [ngModel]="op.count"
+                          (ngModelChange)="op.count = $event"
+                        />
+                      </td>
+                      <td class="text-center">
+                        <button
+                          type="button"
+                          class="op-remove-btn"
+                          [disabled]="operations().length <= 1"
+                          (click)="removeOperation($index)"
+                          title="Remove Operation"
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">
+          {{ 'CANCEL' | translate }}
+        </button>
+        <button type="button" class="btn btn-primary" (click)="savePart()">
+          {{ (isEditMode() ? 'SAVE' : 'ADD_PART_BTN') | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (isDeleteConfirmOpen()) {
+  <div class="modal-backdrop" (click)="closeDeleteConfirm()">
+    <div class="modal-card modal-delete" (click)="$event.stopPropagation()">
+      <div class="delete-icon-wrapper">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+
+      <div class="delete-content">
+        <h3 class="delete-title">{{ 'DELETE_PART_TITLE' | translate }}</h3>
+        <p class="delete-desc">
+          Are you sure you want to delete part
+          <strong>{{ partToDelete()?.part_name }}</strong> (<strong>{{ partToDelete()?.part_id }}</strong>, Program: <strong>{{ partToDelete()?.program_number }}</strong>)?
+        </p>
+        <p class="delete-warning">{{ 'PART_DELETE_WARNING' | translate }}</p>
+      </div>
+
+      <div class="modal-footer delete-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDeleteConfirm()">
+          {{ 'CANCEL' | translate }}
+        </button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()">
+          {{ 'CONFIRM_DELETE_BTN' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

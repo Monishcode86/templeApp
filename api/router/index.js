@@ -4,6 +4,7 @@ const userRoute = require('./userrouter');
 const plantRoute = require('./plantRouter');
 const shiftRoute = require('./shiftRouter');
 const departmentRoute = require('./departmentRouter');
+const partRoute = require('./partRouter');
 
 const router = express.Router();
 
@@ -22,5 +23,6 @@ router.use('/user', userRoute);
 router.use('/plant', plantRoute);
 router.use('/shift', shiftRoute);
 router.use('/department', departmentRoute);
+router.use('/part', partRoute);
 
 module.exports = router;
