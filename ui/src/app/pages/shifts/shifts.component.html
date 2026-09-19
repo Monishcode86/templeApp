@@ -2,8 +2,8 @@
   <!-- Page Header -->
   <div class="page-header">
     <div class="header-titles">
-      <h1 class="page-title">Shift Configuration</h1>
-      <p class="page-subtitle">Manage work shifts, timing, and plant assignments</p>
+      <h1 class="page-title">{{ 'SHIFTS_HEADING' | translate }}</h1>
+      <p class="page-subtitle">{{ 'SHIFTS_SUBHEADING' | translate }}</p>
     </div>
     <div class="header-actions">
       <button class="btn btn-primary create-btn" (click)="openAddModal()">
@@ -11,7 +11,7 @@
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
-        <span>Add Shift</span>
+        <span>{{ 'ADD_SHIFT_BTN' | translate }}</span>
       </button>
     </div>
   </div>
@@ -48,7 +48,7 @@
         </svg>
         <input
           type="text"
-          placeholder="Search shifts..."
+          [placeholder]="'SEARCH_SHIFTS_PLACEHOLDER' | translate"
           [ngModel]="searchQuery()"
           (ngModelChange)="onSearchChange($event)" />
         @if (searchQuery()) {
@@ -92,13 +92,13 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>Shift ID</th>
-            <th>Shift Name</th>
-            <th>Plant</th>
-            <th>Start Time</th>
-            <th>End Time</th>
-            <th>Duration</th>
-            <th class="text-right">Actions</th>
+            <th>{{ 'COL_SHIFT_ID' | translate }}</th>
+            <th>{{ 'COL_SHIFT_NAME' | translate }}</th>
+            <th>{{ 'COL_PLANT' | translate }}</th>
+            <th>{{ 'COL_START_TIME' | translate }}</th>
+            <th>{{ 'COL_END_TIME' | translate }}</th>
+            <th>{{ 'COL_DURATION' | translate }}</th>
+            <th class="text-right">{{ 'COL_ACTIONS' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -119,7 +119,7 @@
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
-                  <p>No shifts found. Click "Add Shift" to get started.</p>
+                  <p>{{ 'NO_SHIFTS_FOUND' | translate }}</p>
                 </div>
               </td>
             </tr>
@@ -156,23 +156,23 @@
                 </td>
                 <td class="text-right">
                   <div class="action-buttons">
-                    <button type="button" class="action-btn edit-btn" (click)="openEditModal(shift)" title="Edit Shift Name">
+                    <button type="button" class="action-btn edit-btn" (click)="openEditModal(shift)" [title]="'EDIT_SHIFT_TITLE' | translate">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                       </svg>
-                      <span class="btn-text">Edit</span>
+                      <span class="btn-text">{{ 'EDIT' | translate }}</span>
                     </button>
                     @if (isLastShift(shift)) {
-                      <button type="button" class="action-btn delete-btn" (click)="confirmDelete(shift)" title="Delete Shift">
+                      <button type="button" class="action-btn delete-btn" (click)="confirmDelete(shift)" [title]="'DELETE_SHIFT_TITLE' | translate">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                           <polyline points="3 6 5 6 21 6"></polyline>
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                         </svg>
-                        <span class="btn-text">Delete</span>
+                        <span class="btn-text">{{ 'DELETE' | translate }}</span>
                       </button>
                     } @else {
-                      <button type="button" class="action-btn action-btn-disabled" disabled title="Cannot delete from the middle. Only the last shift can be deleted.">
+                      <button type="button" class="action-btn action-btn-disabled" disabled [title]="'DELETE_SHIFT_LAST_ONLY_NOTE' | translate">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                           <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -204,7 +204,7 @@
     <div class="modal-overlay" (click)="closeModal()">
       <div class="modal-card" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h3 class="modal-title">{{ isEditMode() ? 'Edit Shift Name' : 'Create Shift' }}</h3>
+          <h3 class="modal-title">{{ (isEditMode() ? 'EDIT_SHIFT_TITLE' : 'ADD_SHIFT_TITLE') | translate }}</h3>
           <button class="icon-btn close-modal" (click)="closeModal()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -235,10 +235,10 @@
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
-                  Daily capacity
+                  {{ 'CYCLE_INCOMPLETE' | translate }}
                 </span>
                 <span class="capacity-value" [class.capacity-zero]="remainingSeconds() === 0">
-                  {{ remainingSeconds() === 0 ? 'Full — no capacity remaining' : formatRemaining() + ' remaining' }}
+                  {{ remainingSeconds() === 0 ? ('CYCLE_COMPLETE' | translate) : formatRemaining() + ' remaining' }}
                 </span>
               </div>
               <div class="capacity-track">
@@ -254,13 +254,13 @@
           <!-- Shift ID (read-only in edit mode) -->
           @if (isEditMode()) {
             <div class="form-group">
-              <label>Shift ID <span class="label-note">(auto-generated, not editable)</span></label>
+              <label>{{ 'COL_SHIFT_ID' | translate }} <span class="label-note">(auto-generated, not editable)</span></label>
               <input type="text" disabled [value]="'#' + (editingShift()?.shift_id ?? '')" class="input-readonly" />
             </div>
           }
 
           <div class="form-group">
-            <label>Shift Name *</label>
+            <label>{{ 'LABEL_SHIFT_NAME' | translate }} *</label>
             <input
               type="text"
               required
@@ -271,7 +271,7 @@
           </div>
 
           <div class="form-group">
-            <label>Plant * @if (isEditMode()) { <span class="label-note">(locked)</span> }</label>
+            <label>{{ 'LABEL_SELECT_PLANT' | translate }} * @if (isEditMode()) { <span class="label-note">(locked)</span> }</label>
             <div class="select-wrapper">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M2 20V10l5-3v3l5-3v3l5-3v13H2z"></path>
@@ -283,7 +283,7 @@
                 [ngModel]="formData().plant_id"
                 (ngModelChange)="onPlantSelect($event)"
                 name="plant_id">
-                <option value="">-- Select Plant --</option>
+                <option value="">{{ 'SELECT_PLANT' | translate }}</option>
                 @for (plant of plantsList(); track plant.plant_id) {
                   <option [value]="plant.plant_id">{{ plant.plant_name }} ({{ plant.plant_id }})</option>
                 }
@@ -293,7 +293,7 @@
 
           <div class="form-row-2">
             <div class="form-group">
-              <label>Start Time * (hh:mm:ss) @if (isEditMode()) { <span class="label-note">(locked)</span> }</label>
+              <label>{{ 'LABEL_START_TIME' | translate }} * (hh:mm:ss) @if (isEditMode()) { <span class="label-note">(locked)</span> }</label>
               <div class="time-input-wrapper">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"></circle>
@@ -312,7 +312,7 @@
             </div>
 
             <div class="form-group">
-              <label>End Time * (hh:mm:ss) @if (isEditMode()) { <span class="label-note">(locked)</span> }</label>
+              <label>{{ 'LABEL_END_TIME' | translate }} * (hh:mm:ss) @if (isEditMode()) { <span class="label-note">(locked)</span> }</label>
               <div class="time-input-wrapper">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"></circle>
@@ -338,14 +338,20 @@
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 16 14"></polyline>
               </svg>
-              <span>Duration: <strong>{{ getDuration(formData().start_time, formData().end_time) }}</strong></span>
+              <span>{{ 'COL_DURATION' | translate }}: <strong>{{ getDuration(formData().start_time, formData().end_time) }}</strong></span>
+            </div>
+          }
+
+          @if (isEditMode()) {
+            <div class="field-info-hint">
+              <span>{{ 'CAN_ONLY_EDIT_NAME_NOTE' | translate }}</span>
             </div>
           }
 
           <div class="modal-actions">
-            <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">{{ 'CANCEL' | translate }}</button>
             <button type="submit" class="btn btn-primary" [disabled]="isLoading()">
-              {{ isEditMode() ? 'Save Changes' : 'Create Shift' }}
+              {{ (isEditMode() ? 'SAVE' : 'CREATE') | translate }}
             </button>
           </div>
         </form>
@@ -358,7 +364,7 @@
     <div class="modal-overlay" (click)="cancelDelete()">
       <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h3 class="modal-title">Delete Shift</h3>
+          <h3 class="modal-title">{{ 'DELETE_SHIFT_TITLE' | translate }}</h3>
           <button class="icon-btn close-modal" (click)="cancelDelete()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -367,15 +373,15 @@
           </button>
         </div>
         <div class="modal-body">
-          <p>Are you sure you want to delete this shift? This action cannot be undone.</p>
+          <p>{{ 'DELETE_SHIFT_CONFIRM' | translate }}</p>
           <div class="delete-target-box">
             <strong>{{ shiftToDelete()?.shift_name }}</strong>
             <span class="cell-muted"> &mdash; {{ shiftToDelete()?.plant_name }}</span>
           </div>
         </div>
         <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
-          <button type="button" class="btn btn-danger" [disabled]="isLoading()" (click)="executeDelete()">Delete Shift</button>
+          <button type="button" class="btn btn-secondary" (click)="cancelDelete()">{{ 'CANCEL' | translate }}</button>
+          <button type="button" class="btn btn-danger" [disabled]="isLoading()" (click)="executeDelete()">{{ 'CONFIRM_DELETE_BTN' | translate }}</button>
         </div>
       </div>
     </div>

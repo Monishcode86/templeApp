@@ -6,12 +6,13 @@ import { DepartmentService } from '../../core/services/department.service';
 import { PlantService } from '../../core/services/plant.service';
 import { ShiftService } from '../../core/services/shift.service';
 import { Department, DepartmentShift, Plant, Shift } from '../../core/models/auth.model';
+import { TranslatePipe } from '../../core/services/translation.service';
 import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
 
 @Component({
   selector: 'app-departments',
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginationComponent],
+  imports: [CommonModule, FormsModule, TranslatePipe, PaginationComponent],
   templateUrl: './departments.component.html',
   styleUrls: ['./departments.component.css']
 })

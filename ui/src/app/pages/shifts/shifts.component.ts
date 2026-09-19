@@ -5,12 +5,13 @@ import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs'
 import { ShiftService } from '../../core/services/shift.service';
 import { PlantService } from '../../core/services/plant.service';
 import { Shift, Plant } from '../../core/models/auth.model';
+import { TranslatePipe } from '../../core/services/translation.service';
 import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
 
 @Component({
   selector: 'app-shifts',
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginationComponent],
+  imports: [CommonModule, FormsModule, TranslatePipe, PaginationComponent],
   templateUrl: './shifts.component.html',
   styleUrls: ['./shifts.component.css']
 })
