@@ -422,6 +422,14 @@ export class PartsComponent implements OnInit, OnDestroy {
     this.isDeleteConfirmOpen.set(false);
   }
 
+  cancelDelete(): void {
+    this.closeDeleteConfirm();
+  }
+
+  executeDelete(): void {
+    this.confirmDelete();
+  }
+
   confirmDelete(): void {
     const part = this.partToDelete();
     if (!part?._id) return;
