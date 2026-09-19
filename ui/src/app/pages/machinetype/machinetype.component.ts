@@ -33,10 +33,9 @@ export class MachineTypeComponent implements OnInit, OnDestroy {
   pageSize = signal<number>(10);
   filterPlantId = signal<string>('');
   searchQuery = signal<string>('');
-
-  // Toast notification
-  toastMessage = signal<string | null>(null);
-  toastType = signal<'success' | 'error'>('success');
+  // Toast / Alerts
+  successMessage = signal<string | null>(null);
+  errorMessage = signal<string | null>(null);
   private toastTimer: any = null;
 
   // Add / Edit Modal state
@@ -69,7 +68,6 @@ export class MachineTypeComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadPlants();
-    this.loadMachineTypes();
 
     this.searchSub = this.searchSubject
       .pipe(debounceTime(350), distinctUntilChanged())
@@ -92,9 +90,14 @@ export class MachineTypeComponent implements OnInit, OnDestroy {
       next: (res) => {
         const plants = (res.data || []) as Plant[];
         this.plantsList.set(plants);
+        if (plants.length > 0 && !this.filterPlantId()) {
+          this.filterPlantId.set(plants[0].plant_id);
+        }
+        this.loadMachineTypes();
       },
       error: () => {
         this.plantsList.set([]);
+        this.loadMachineTypes();
       }
     });
   }
@@ -138,6 +141,11 @@ export class MachineTypeComponent implements OnInit, OnDestroy {
 
   onSearchInput(val: string): void {
     this.searchSubject.next(val);
+  }
+
+  clearSearch(): void {
+    this.searchQuery.set('');
+    this.searchSubject.next('');
   }
 
   onPlantFilterChange(plantId: string): void {
@@ -293,16 +301,16 @@ export class MachineTypeComponent implements OnInit, OnDestroy {
   }
 
   showSuccess(msg: string): void {
-    this.toastMessage.set(msg);
-    this.toastType.set('success');
+    this.successMessage.set(msg);
+    this.errorMessage.set(null);
     if (this.toastTimer) clearTimeout(this.toastTimer);
-    this.toastTimer = setTimeout(() => this.toastMessage.set(null), 4000);
+    this.toastTimer = setTimeout(() => this.successMessage.set(null), 4000);
   }
 
   showError(msg: string): void {
-    this.toastMessage.set(msg);
-    this.toastType.set('error');
+    this.errorMessage.set(msg);
+    this.successMessage.set(null);
     if (this.toastTimer) clearTimeout(this.toastTimer);
-    this.toastTimer = setTimeout(() => this.toastMessage.set(null), 4000);
+    this.toastTimer = setTimeout(() => this.errorMessage.set(null), 4000);
   }
 }
