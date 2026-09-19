@@ -52,6 +52,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/downtime/downtime.component').then((m) => m.DowntimeComponent),
       },
+      {
+        path: 'machinetype',
+        loadComponent: () =>
+          import('./pages/machinetype/machinetype.component').then((m) => m.MachineTypeComponent),
+      },
     ],
   },
   {

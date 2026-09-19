@@ -104,6 +104,17 @@ export interface DowntimeReason {
   updatedAt?: string;
 }
 
+export interface MachineType {
+  _id?: string;
+  plant_id: string;
+  plant_name: string;
+  machinetype_id?: string; // M1, M2, M3...
+  machinetype: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;

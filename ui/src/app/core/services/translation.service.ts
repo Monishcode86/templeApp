@@ -20,6 +20,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     NAV_DEPARTMENTS: 'Department Configuration',
     NAV_PARTS: 'Part Master Configuration',
     NAV_DOWNTIME: 'Downtime Configuration',
+    NAV_MACHINE_TYPE: 'Machine Type Configuration',
     NAV_SYSTEM: 'System Health',
     NAV_LOGOUT: 'Logout',
     NAV_PROFILE: 'Profile',
@@ -224,7 +225,24 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     ADD_SUB_REASON_BTN: 'Add Sub-Reason',
     DELETE_DOWNTIME_TITLE: 'Delete Reason',
     DELETE_DOWNTIME_CONFIRM: 'Are you sure you want to delete this reason?',
-    DOWNTIME_DELETE_WARNING: 'The reason and all associated sub-reasons will be permanently removed.'
+    DOWNTIME_DELETE_WARNING: 'The reason and all associated sub-reasons will be permanently removed.',
+
+    // Machine Type Management
+    MACHINE_TYPE_HEADING: 'Machine Type Configuration',
+    MACHINE_TYPE_SUBHEADING: 'Configure and manage machine types per plant',
+    ADD_MACHINE_TYPE_BTN: 'Add Machine Type',
+    SEARCH_MACHINE_TYPES_PLACEHOLDER: 'Search by ID, machine type, description, or plant...',
+    COL_MACHINE_TYPE_ID: 'Machine Type ID',
+    COL_MACHINE_TYPE: 'Machine Type',
+    COL_DESCRIPTION: 'Description',
+    NO_MACHINE_TYPES_FOUND: 'No machine types configured yet. Click "Add Machine Type" to create your first machine type.',
+    EDIT_MACHINE_TYPE_TITLE: 'Edit Machine Type',
+    ADD_MACHINE_TYPE_TITLE: 'Configure Machine Type',
+    LABEL_MACHINE_TYPE: 'Machine Type Name',
+    LABEL_DESCRIPTION: 'Description / Notes',
+    DELETE_MACHINE_TYPE_TITLE: 'Delete Machine Type',
+    DELETE_MACHINE_TYPE_CONFIRM: 'Are you sure you want to delete this machine type?',
+    MACHINE_TYPE_DELETE_WARNING: 'This machine type will be permanently removed from this plant.'
   },
   es: {
     // Navigation & Layout
@@ -237,6 +255,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     NAV_DEPARTMENTS: 'Configuración de Departamentos',
     NAV_PARTS: 'Configuración de Partes',
     NAV_DOWNTIME: 'Configuración de Paradas',
+    NAV_MACHINE_TYPE: 'Configuración de Tipos de Máquina',
     NAV_SYSTEM: 'Estado del Sistema',
     NAV_LOGOUT: 'Cerrar Sesión',
     NAV_PROFILE: 'Perfil',
@@ -441,7 +460,24 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     ADD_SUB_REASON_BTN: 'Agregar Submotivo',
     DELETE_DOWNTIME_TITLE: 'Eliminar Motivo',
     DELETE_DOWNTIME_CONFIRM: '¿Está seguro de que desea eliminar este motivo?',
-    DOWNTIME_DELETE_WARNING: 'Se eliminarán permanentemente el motivo y todos los submotivos asociados.'
+    DOWNTIME_DELETE_WARNING: 'Se eliminarán permanentemente el motivo y todos los submotivos asociados.',
+
+    // Machine Type Management (ES)
+    MACHINE_TYPE_HEADING: 'Configuración de Tipos de Máquina',
+    MACHINE_TYPE_SUBHEADING: 'Configure y gestione tipos de máquina por planta',
+    ADD_MACHINE_TYPE_BTN: 'Agregar Tipo de Máquina',
+    SEARCH_MACHINE_TYPES_PLACEHOLDER: 'Buscar por ID, tipo de máquina, descripción o planta...',
+    COL_MACHINE_TYPE_ID: 'ID Tipo Máquina',
+    COL_MACHINE_TYPE: 'Tipo de Máquina',
+    COL_DESCRIPTION: 'Descripción',
+    NO_MACHINE_TYPES_FOUND: 'Aún no hay tipos de máquina configurados. Haga clic en "Agregar Tipo de Máquina" para crear el primero.',
+    EDIT_MACHINE_TYPE_TITLE: 'Editar Tipo de Máquina',
+    ADD_MACHINE_TYPE_TITLE: 'Configurar Tipo de Máquina',
+    LABEL_MACHINE_TYPE: 'Nombre de Tipo de Máquina',
+    LABEL_DESCRIPTION: 'Descripción / Notas',
+    DELETE_MACHINE_TYPE_TITLE: 'Eliminar Tipo de Máquina',
+    DELETE_MACHINE_TYPE_CONFIRM: '¿Está seguro de que desea eliminar este tipo de máquina?',
+    MACHINE_TYPE_DELETE_WARNING: 'Este tipo de máquina se eliminará permanentemente de esta planta.'
   },
   fr: {
     // Navigation & Layout
@@ -454,6 +490,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     NAV_DEPARTMENTS: 'Configuration des Départements',
     NAV_PARTS: 'Configuration des Pièces',
     NAV_DOWNTIME: 'Configuration des Arrêts',
+    NAV_MACHINE_TYPE: 'Configuration des Types de Machine',
     NAV_SYSTEM: 'État du Système',
     NAV_LOGOUT: 'Déconnexion',
     NAV_PROFILE: 'Profil',
@@ -658,7 +695,24 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     ADD_SUB_REASON_BTN: 'Ajouter un Sous-Motif',
     DELETE_DOWNTIME_TITLE: 'Supprimer le Motif',
     DELETE_DOWNTIME_CONFIRM: 'Voulez-vous vraiment supprimer ce motif ?',
-    DOWNTIME_DELETE_WARNING: 'Le motif et tous les sous-motifs associés seront définitivement supprimés.'
+    DOWNTIME_DELETE_WARNING: 'Le motif et tous les sous-motifs associés seront définitivement supprimés.',
+
+    // Machine Type Management (FR)
+    MACHINE_TYPE_HEADING: 'Configuration des Types de Machine',
+    MACHINE_TYPE_SUBHEADING: 'Configurez et gérez les types de machine par usine',
+    ADD_MACHINE_TYPE_BTN: 'Ajouter un Type de Machine',
+    SEARCH_MACHINE_TYPES_PLACEHOLDER: 'Rechercher par ID, type de machine, description ou usine...',
+    COL_MACHINE_TYPE_ID: 'ID Type Machine',
+    COL_MACHINE_TYPE: 'Type de Machine',
+    COL_DESCRIPTION: 'Description',
+    NO_MACHINE_TYPES_FOUND: 'Aucun type de machine configuré. Cliquez sur "Ajouter un Type de Machine" pour créer le premier.',
+    EDIT_MACHINE_TYPE_TITLE: 'Modifier le Type de Machine',
+    ADD_MACHINE_TYPE_TITLE: 'Configurer un Type de Machine',
+    LABEL_MACHINE_TYPE: 'Nom du Type de Machine',
+    LABEL_DESCRIPTION: 'Description / Remarques',
+    DELETE_MACHINE_TYPE_TITLE: 'Supprimer le Type de Machine',
+    DELETE_MACHINE_TYPE_CONFIRM: 'Voulez-vous vraiment supprimer ce type de machine ?',
+    MACHINE_TYPE_DELETE_WARNING: 'Ce type de machine sera définitivement supprimé de cette usine.'
   }
 };
 
