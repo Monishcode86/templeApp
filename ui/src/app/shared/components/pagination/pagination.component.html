@@ -1,0 +1,66 @@
+<div class="pagination-container">
+  <!-- Showing X to Y of Z Entries -->
+  <div class="pagination-info">
+    <span>
+      Showing <strong>{{ startItem() }}</strong> to <strong>{{ endItem() }}</strong> of <strong>{{ totalSignal() }}</strong> entries
+    </span>
+  </div>
+
+  <div class="pagination-controls">
+    <!-- Page Size Selector -->
+    <div class="page-size-selector">
+      <label for="pageSizeSelect">Rows per page:</label>
+      <select 
+        id="pageSizeSelect" 
+        class="select-limit" 
+        [ngModel]="limitSignal()" 
+        (ngModelChange)="onLimitSelect($event)">
+        @for (opt of pageSizeOptions; track opt) {
+          <option [ngValue]="opt">{{ opt }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="page-nav">
+      <!-- Previous Page -->
+      <button 
+        type="button" 
+        class="nav-page-btn prev-btn" 
+        [disabled]="pageSignal() <= 1" 
+        (click)="prev()"
+        aria-label="Previous Page">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <!-- Page Numbers with Ellipses -->
+      @for (item of visiblePages(); track $index) {
+        @if (item === '...') {
+          <span class="page-ellipsis">...</span>
+        } @else {
+          <button 
+            type="button" 
+            class="nav-page-btn number-btn" 
+            [class.active]="item === pageSignal()" 
+            (click)="onPageSelect(item)">
+            {{ item }}
+          </button>
+        }
+      }
+
+      <!-- Next Page -->
+      <button 
+        type="button" 
+        class="nav-page-btn next-btn" 
+        [disabled]="pageSignal() >= totalPages()" 
+        (click)="next()"
+        aria-label="Next Page">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

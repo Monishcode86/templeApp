@@ -1,0 +1,39 @@
+/* ==========================================================================
+   USERS CONFIGURATION PAGE - SPECIFIC OVERRIDES & EXTENSIONS
+   (Core configuration styles inherited from global styles.css)
+   ========================================================================== */
+
+.avatar-mini {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), #3b82f6);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.plant-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.775rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.delete-user-target {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: var(--bg-hover);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}

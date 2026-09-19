@@ -1,0 +1,20 @@
+{
+  "name": "node24api-workspace",
+  "version": "1.0.0",
+  "description": "Fullstack Node 24 REST API and Angular Web Application",
+  "scripts": {
+    "dev:api": "npm run dev --prefix api",
+    "start:api": "npm run start --prefix api",
+    "start:ui": "npm run start --prefix ui",
+    "build:ui": "npm run build --prefix ui",
+    "test:ui": "npm run test --prefix ui"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "angular",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "ISC"
+}

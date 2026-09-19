@@ -1,0 +1,241 @@
+/* Shifts page uses global config-page design system from styles.css */
+
+/* Shift ID Badge */
+.shift-id-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1));
+  color: var(--color-primary);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  letter-spacing: 0.02em;
+}
+
+/* Time Pills */
+.time-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  letter-spacing: 0.02em;
+}
+
+.time-start {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.time-end {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Duration Pill */
+.duration-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Time Input with Icon */
+.time-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.time-input-wrapper svg {
+  position: absolute;
+  left: 0.85rem;
+  color: var(--text-muted);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.time-input-wrapper input[type="time"] {
+  padding-left: 2.5rem !important;
+}
+
+/* Duration Preview */
+.duration-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 8px;
+  background: rgba(99, 102, 241, 0.07);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: -0.25rem;
+}
+
+.duration-preview svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.duration-preview strong {
+  color: var(--color-primary);
+}
+
+/* Select Wrapper with Icon */
+.select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.select-wrapper svg {
+  position: absolute;
+  left: 0.85rem;
+  color: var(--text-muted);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.select-wrapper select {
+  padding-left: 2.5rem !important;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* Read-only input */
+.input-readonly {
+  background: var(--bg-hover) !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* 24h Capacity Bar */
+.capacity-bar-wrapper {
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  margin-bottom: 0.25rem;
+}
+
+.capacity-bar-wrapper.capacity-full {
+  background: rgba(239, 68, 68, 0.07);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.capacity-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.capacity-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.capacity-value {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.capacity-value.capacity-zero {
+  color: #ef4444;
+}
+
+.capacity-track {
+  height: 6px;
+  border-radius: 99px;
+  background: var(--border-color);
+  overflow: hidden;
+}
+
+.capacity-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  transition: width 0.4s ease;
+}
+
+.capacity-fill.capacity-fill-warn {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.capacity-fill.capacity-fill-full {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+/* Label note */
+.label-note {
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-left: 0.35rem;
+}
+
+.locked-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--color-primary);
+  opacity: 0.8;
+}
+
+
+/* Loading Spinner */
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  margin: 0 auto 0.75rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Locked / Disabled Action Button */
+.action-btn.action-btn-disabled,
+.action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: auto;
+  border-color: var(--border-color) !important;
+  color: var(--text-muted) !important;
+  background: var(--bg-hover) !important;
+}
+
+.action-btn.action-btn-disabled:hover,
+.action-btn:disabled:hover {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border-color) !important;
+  background: var(--bg-hover) !important;
+}

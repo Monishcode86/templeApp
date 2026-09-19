@@ -1,0 +1,154 @@
+<div class="dashboard-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-titles">
+      <h1 class="page-title">{{ 'DASHBOARD_HEADING' | translate }}</h1>
+      <p class="page-subtitle">{{ 'DASHBOARD_SUBHEADING' | translate }}</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="loadDashboardData()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+        <span>Refresh</span>
+      </button>
+      <a routerLink="/users" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>{{ 'ADD_USER_BTN' | translate }}</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Key Performance Metrics Grid -->
+  <div class="metrics-grid">
+    <!-- Total Users Card -->
+    <div class="metric-card">
+      <div class="metric-icon-box users-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      </div>
+      <div class="metric-content">
+        <span class="metric-label">{{ 'TOTAL_USERS' | translate }}</span>
+        <div class="metric-value">{{ totalUsers() }}</div>
+        <span class="metric-trend text-success">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+            <polyline points="17 6 23 6 23 12"></polyline>
+          </svg>
+          Active in database
+        </span>
+      </div>
+    </div>
+
+    <!-- API Health Card -->
+    <div class="metric-card">
+      <div class="metric-icon-box health-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
+      </div>
+      <div class="metric-content">
+        <span class="metric-label">{{ 'DATABASE_STATUS' | translate }}</span>
+        <div class="metric-value text-success">Online</div>
+        <span class="metric-trend text-muted">Node.js 24 + Express 5</span>
+      </div>
+    </div>
+
+    <!-- System Uptime Card -->
+    <div class="metric-card">
+      <div class="metric-icon-box uptime-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
+      <div class="metric-content">
+        <span class="metric-label">{{ 'SYSTEM_UPTIME' | translate }}</span>
+        <div class="metric-value">{{ uptime() }}</div>
+        <span class="metric-trend text-muted">Last sync: {{ serverTimestamp() }}</span>
+      </div>
+    </div>
+
+    <!-- Environment Card -->
+    <div class="metric-card">
+      <div class="metric-icon-box env-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+          <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+          <line x1="6" y1="6" x2="6.01" y2="6"></line>
+          <line x1="6" y1="18" x2="6.01" y2="18"></line>
+        </svg>
+      </div>
+      <div class="metric-content">
+        <span class="metric-label">{{ 'SERVER_ENVIRONMENT' | translate }}</span>
+        <div class="metric-value">Production</div>
+        <span class="metric-trend text-muted">Port 5000 / MongoDB Pool</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Users Preview Table -->
+  <div class="panel-card">
+    <div class="panel-header">
+      <div class="panel-title-group">
+        <h2 class="panel-title">{{ 'RECENT_USERS' | translate }}</h2>
+        <span class="panel-badge">{{ recentUsers().length }} users</span>
+      </div>
+      <a routerLink="/users" class="view-all-link">
+        <span>View all</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </a>
+    </div>
+
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>{{ 'COL_USERNAME' | translate }}</th>
+            <th>{{ 'COL_EMAIL' | translate }}</th>
+            <th>{{ 'COL_ROLE' | translate }}</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (recentUsers().length === 0) {
+            <tr>
+              <td colspan="4" class="empty-cell">{{ 'NO_USERS_FOUND' | translate }}</td>
+            </tr>
+          } @else {
+            @for (user of recentUsers(); track user._id || user.id) {
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <span class="avatar-mini">{{ (user.username || 'U').slice(0, 1).toUpperCase() }}</span>
+                    <span class="cell-primary">{{ user.username }}</span>
+                  </div>
+                </td>
+                <td class="cell-muted">{{ user.email }}</td>
+                <td>
+                  <span class="role-badge" [class.badge-admin]="user.role === 'ADMIN'" [class.badge-user]="user.role !== 'ADMIN'">
+                    {{ user.role }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge-status-active">Active</span>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
