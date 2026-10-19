@@ -19,13 +19,12 @@ const userSchema = new mongoose.Schema(
         },
         email: {
             type: String,
-            required: [true, 'Email is required'],
-            unique: true,
+            required: false,
             lowercase: true,
             trim: true,
-            match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email address']
+            default: null
         },
-        employee_id: {
+        user_id: {
             type: String,
             trim: true,
             default: null
@@ -35,12 +34,27 @@ const userSchema = new mongoose.Schema(
             trim: true,
             default: null
         },
-        plant_id: {
+        address: {
+            type: String,
+            required: [true, 'Address is required'],
+            trim: true
+        },
+        country_code: {
+            type: String,
+            trim: true,
+            default: '+91'
+        },
+        mobile_number: {
             type: String,
             trim: true,
             default: null
         },
-        plant_name: {
+        alt_country_code: {
+            type: String,
+            trim: true,
+            default: '+91'
+        },
+        alt_mobile_number: {
             type: String,
             trim: true,
             default: null
@@ -58,8 +72,9 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-// Helpful compound and single indexes
-userSchema.index({ employee_id: 1 });
-userSchema.index({ plant_id: 1 });
+// Helpful single and compound indexes
+userSchema.index({ user_id: 1 });
+userSchema.index({ email: 1 }, { sparse: true });
 
 module.exports = mongoose.model('users', userSchema);
+

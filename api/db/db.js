@@ -77,7 +77,9 @@ async function initAdmin() {
                 username: 'admin',
                 password: hashedPasswordValue,
                 role: 'ADMIN',
-                email: adminEmail
+                email: adminEmail,
+                address: 'System Administration HQ',
+                user_id: 'ADM001'
             };
 
             await UserModel.create(admin);

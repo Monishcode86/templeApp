@@ -18,7 +18,7 @@ export class AuthService {
   // Reactive Angular signals
   private currentUserSignal = signal<User | null>(this.loadStoredUser());
   readonly currentUser = computed(() => this.currentUserSignal());
-  readonly isLoggedIn = computed(() => !!this.currentUserSignal() && !!this.getAccessToken());
+  readonly isLoggedIn = computed(() => !!this.currentUserSignal() && this.currentUserSignal()?.role === 'ADMIN' && !!this.getAccessToken());
   readonly isAdmin = computed(() => this.currentUserSignal()?.role === 'ADMIN');
 
   /**
@@ -32,6 +32,10 @@ export class AuthService {
     return this.http.post<ApiResponse<AuthResponse>>('/api/login', payload).pipe(
       tap((response) => {
         if (response.data) {
+          if (response.data.user?.role !== 'ADMIN') {
+            this.logout();
+            throw new Error('Access denied. Only administrators are allowed to sign in.');
+          }
           this.setTokens(response.data.accessToken, response.data.refreshToken);
           this.setUser(response.data.user);
         }
@@ -52,6 +56,10 @@ export class AuthService {
     return this.http.post<ApiResponse<AuthResponse>>('/api/login/refresh', { refreshToken }).pipe(
       tap((response) => {
         if (response.data) {
+          if (response.data.user && response.data.user.role !== 'ADMIN') {
+            this.logout();
+            throw new Error('Access denied. Only administrators are allowed to sign in.');
+          }
           this.setTokens(response.data.accessToken, response.data.refreshToken);
           if (response.data.user) {
             this.setUser(response.data.user);
@@ -114,7 +122,14 @@ export class AuthService {
       const stored = localStorage.getItem(this.USER_KEY);
       if (stored) {
         try {
-          return JSON.parse(stored);
+          const user = JSON.parse(stored);
+          if (user?.role !== 'ADMIN') {
+            localStorage.removeItem(this.ACCESS_TOKEN_KEY);
+            localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+            localStorage.removeItem(this.USER_KEY);
+            return null;
+          }
+          return user;
         } catch {
           return null;
         }

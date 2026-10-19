@@ -1,13 +1,8 @@
 const express = require('express');
 const loginRoute = require('./loginrouter');
 const userRoute = require('./userrouter');
-const plantRoute = require('./plantRouter');
-const shiftRoute = require('./shiftRouter');
-const departmentRoute = require('./departmentRouter');
-const partRoute = require('./partRouter');
-const downtimeRoute = require('./downtimeRouter');
-const machineTypeRoute = require('./machineTypeRouter');
-const machineRoute = require('./machineRouter');
+const donationRoute = require('./donationrouter');
+const notificationRoute = require('./notificationrouter');
 
 const router = express.Router();
 
@@ -23,12 +18,7 @@ router.get('/health', (req, res) => {
 // Mount modular sub-routers
 router.use('/login', loginRoute);
 router.use('/user', userRoute);
-router.use('/plant', plantRoute);
-router.use('/shift', shiftRoute);
-router.use('/department', departmentRoute);
-router.use('/part', partRoute);
-router.use('/downtime', downtimeRoute);
-router.use('/machinetype', machineTypeRoute);
-router.use('/machine', machineRoute);
+router.use('/donation', donationRoute);
+router.use('/notification', notificationRoute);
 
 module.exports = router;

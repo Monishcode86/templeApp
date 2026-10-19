@@ -4,8 +4,8 @@
    ========================================================================== */
 
 .avatar-mini {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--color-primary), #3b82f6);
   color: #ffffff;
@@ -13,20 +13,197 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.plant-badge {
+.avatar-img {
+  object-fit: cover;
+}
+
+.user-id-badge {
   display: inline-flex;
   align-items: center;
-  font-size: 0.775rem;
-  font-weight: 500;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  background: rgba(99, 102, 241, 0.08);
   color: var(--color-primary);
-  max-width: 180px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.address-cell {
+  max-width: 220px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.phone-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+/* User ID Input & Readonly Styling */
+.user-id-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-id-input {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.readonly-input {
+  background-color: var(--bg-hover) !important;
+  color: var(--color-primary) !important;
+  cursor: default !important;
+  border-color: var(--border-color) !important;
+  user-select: all;
+}
+
+.readonly-input:focus {
+  border-color: var(--border-color) !important;
+  box-shadow: none !important;
+}
+
+.refresh-code-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-hover);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.refresh-code-btn:hover {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+}
+
+/* Address 3-Line Paragraph Textarea */
+.form-textarea {
+  width: 100%;
+  padding: 0.75rem 0.875rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-input);
+  color: var(--text-main);
+  font-size: 0.875rem;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 80px;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+/* intl-tel-input Full Styling Integration */
+.iti-wrapper {
+  width: 100%;
+}
+
+:host ::ng-deep .iti {
+  width: 100%;
+  display: block;
+}
+
+:host ::ng-deep .iti-phone-input {
+  width: 100%;
+  padding: 0.68rem 0.875rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-input);
+  color: var(--text-main);
+  font-size: 0.875rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+:host ::ng-deep .iti-phone-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+:host ::ng-deep .iti__country-list {
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45) !important;
+  z-index: 99999 !important;
+  border-radius: 8px !important;
+  max-height: 220px !important;
+}
+
+:host ::ng-deep .iti__country {
+  padding: 8px 12px !important;
+  color: var(--text-main) !important;
+  font-size: 0.85rem !important;
+}
+
+:host ::ng-deep .iti__country:hover,
+:host ::ng-deep .iti__country.iti__highlight {
+  background-color: var(--bg-hover) !important;
+}
+
+:host ::ng-deep .iti__country-name,
+:host ::ng-deep .iti__dial-code {
+  color: var(--text-main) !important;
+}
+
+:host ::ng-deep .iti__search-input {
+  background-color: var(--bg-input) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 6px !important;
+  padding: 7px 10px !important;
+  margin-bottom: 5px !important;
+  outline: none !important;
+}
+
+:host ::ng-deep .iti__selected-country {
+  background: transparent !important;
+}
+
+:host ::ng-deep .iti__selected-dial-code {
+  color: var(--text-main) !important;
+  font-weight: 500 !important;
+  font-size: 0.875rem !important;
+}
+
+.optional-badge {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 0.35rem;
 }
 
 .delete-user-target {

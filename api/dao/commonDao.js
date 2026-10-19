@@ -127,3 +127,19 @@ exports.deleteMany = async (data, schemaName) => {
     }
     return await collectionName.deleteMany(data);
 };
+
+/**
+ * Find a single document and atomically update it (concurrency-safe lock)
+ */
+exports.findOneAndUpdate = async (searchFields = {}, schemaName, id) => {
+    const collectionName = id ? schema[schemaName](id) : schema[schemaName];
+    if (!collectionName) {
+        throw new Error(`Schema '${schemaName}' not found in DTO registry.`);
+    }
+
+    const filter = searchFields.filter || searchFields.query || {};
+    const update = searchFields.update || {};
+    const options = searchFields.options || { returnDocument: 'after' };
+
+    return await collectionName.findOneAndUpdate(filter, update, options);
+};

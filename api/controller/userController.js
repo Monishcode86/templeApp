@@ -2,7 +2,7 @@ const { adduser, getalluser, getuser, updateuser, deleteuser } = require('../ser
 
 const adduserController = async (req, res, next) => {
     try {
-        const data = await adduser(req.body);
+        const data = await adduser(req.body, req.user);
         return res.status(201).json({ status: 'Success', data });
     } catch (error) {
         return next(error);

@@ -18,24 +18,24 @@
 
   <!-- Toast Notification Alerts -->
   @if (successMessage()) {
-    <div class="toast-alert toast-success">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-      </svg>
-      <span>{{ successMessage() }}</span>
-    </div>
+  <div class="toast-alert toast-success">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <span>{{ successMessage() }}</span>
+  </div>
   }
 
   @if (errorMessage()) {
-    <div class="toast-alert toast-error">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      <span>{{ errorMessage() }}</span>
-    </div>
+  <div class="toast-alert toast-error">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <span>{{ errorMessage() }}</span>
+  </div>
   }
 
   <!-- Filter & Search Toolbar -->
@@ -43,43 +43,21 @@
     <div class="toolbar-left-group">
       <!-- Search Input -->
       <div class="search-input-wrapper">
-        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <input 
-          type="text" 
-          [placeholder]="'SEARCH_PLACEHOLDER' | translate" 
-          [ngModel]="searchQuery()" 
+        <input type="text" [placeholder]="'SEARCH_PLACEHOLDER' | translate" [ngModel]="searchQuery()"
           (ngModelChange)="onSearchChange($event)" />
         @if (searchQuery()) {
-          <button type="button" class="clear-search-btn" (click)="clearSearch()" title="Clear search">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
+        <button type="button" class="clear-search-btn" (click)="clearSearch()" title="Clear search">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
         }
-      </div>
-
-      <!-- Plant Dropdown Filter (Onload selects first plant and queries users for that plant) -->
-      <div class="plant-filter-dropdown" [title]="'COL_PLANT' | translate">
-        <svg class="plant-select-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-        </svg>
-        <select 
-          class="filter-select"
-          [ngModel]="selectedPlantId()" 
-          (ngModelChange)="onPlantFilterChange($event)">
-          @if (plantsList().length === 0) {
-            <option value="">-- No Plants Configured --</option>
-          } @else {
-            @for (plant of plantsList(); track plant._id || plant.plant_id) {
-              <option [value]="plant.plant_id">{{ plant.plant_name }} ({{ plant.plant_id }})</option>
-            }
-          }
-        </select>
       </div>
     </div>
 
@@ -95,256 +73,256 @@
         <thead>
           <tr>
             <th>{{ 'COL_USERNAME' | translate }}</th>
+            <th>{{ 'COL_USER_ID' | translate }}</th>
             <th>{{ 'COL_EMAIL' | translate }}</th>
-            <th>{{ 'COL_EMPLOYEE_ID' | translate }}</th>
-            <th>{{ 'COL_PLANT' | translate }}</th>
-            <th>{{ 'COL_ROLE' | translate }}</th>
+            <th>{{ 'COL_MOBILE' | translate }}</th>
             <th class="text-right">{{ 'COL_ACTIONS' | translate }}</th>
           </tr>
         </thead>
         <tbody>
           @if (displayedUsers().length === 0) {
-            <tr>
-              <td colspan="6" class="empty-cell">{{ 'NO_USERS_FOUND' | translate }}</td>
-            </tr>
+          <tr>
+            <td colspan="7" class="empty-cell">{{ 'NO_USERS_FOUND' | translate }}</td>
+          </tr>
           } @else {
-            @for (user of displayedUsers(); track user._id || user.id) {
-              <tr>
-                <td>
-                  <div class="user-cell">
-                    @if (user.image) {
-                      <img [src]="getImageUrl(user.image)" [alt]="user.username" class="avatar-mini avatar-img" />
-                    } @else {
-                      <span class="avatar-mini">{{ (user.username || 'U').slice(0, 1).toUpperCase() }}</span>
-                    }
-                    <span class="cell-primary">{{ user.username }}</span>
-                  </div>
-                </td>
-                <td class="cell-muted">{{ user.email }}</td>
-                <td>
-                  <span class="emp-badge">{{ user.employee_id || '—' }}</span>
-                </td>
-                <td>
-                  <span class="plant-badge" [title]="user.plant_name || ''">
-                    {{ user.plant_name || user.plant_id || '—' }}
-                  </span>
-                </td>
-                <td>
-                  <span class="role-badge" [class.badge-admin]="user.role === 'ADMIN'" [class.badge-user]="user.role !== 'ADMIN'">
-                    {{ user.role }}
-                  </span>
-                </td>
-                <td class="text-right">
-                  <div class="action-buttons">
-                    <button type="button" class="action-btn edit-btn" (click)="openEditModal(user)" [title]="'EDIT' | translate">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                      </svg>
-                      <span class="btn-text">{{ 'EDIT' | translate }}</span>
-                    </button>
-                    @if (user.role !== 'ADMIN') {
-                      <button type="button" class="action-btn delete-btn" (click)="confirmDelete(user)" [title]="'DELETE' | translate">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                          <polyline points="3 6 5 6 21 6"></polyline>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                          <line x1="10" y1="11" x2="10" y2="17"></line>
-                          <line x1="14" y1="11" x2="14" y2="17"></line>
-                        </svg>
-                        <span class="btn-text">{{ 'DELETE' | translate }}</span>
-                      </button>
-                    }
-                  </div>
-                </td>
-              </tr>
-            }
+          @for (user of displayedUsers(); track user._id || user.id) {
+          <tr>
+            <td>
+              <div class="user-cell">
+                @if (user.image) {
+                <img [src]="getImageUrl(user.image)" [alt]="user.username" class="avatar-mini avatar-img" />
+                } @else {
+                <span class="avatar-mini">{{ (user.username || 'U').slice(0, 1).toUpperCase() }}</span>
+                }
+                <span class="cell-primary">{{ user.username }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="user-id-badge" title="User ID">{{ user.user_id || user.employee_id || '—' }}</span>
+            </td>
+            <td class="cell-muted">{{ user.email || '—' }}</td>
+            <td>
+              @if (user.mobile_number) {
+              <span class="phone-cell">
+                <strong>{{ user.country_code || '+91' }}</strong> {{ user.mobile_number }}
+              </span>
+              } @else {
+              <span class="cell-muted">—</span>
+              }
+            </td>
+            <td class="text-right">
+              <div class="action-buttons">
+                <button type="button" class="action-btn edit-btn" (click)="openEditModal(user)"
+                  [title]="'EDIT' | translate">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                  <span class="btn-text">{{ 'EDIT' | translate }}</span>
+                </button>
+                @if (user.role !== 'ADMIN') {
+                <button type="button" class="action-btn delete-btn" (click)="confirmDelete(user)"
+                  [title]="'DELETE' | translate">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                  </svg>
+                  <span class="btn-text">{{ 'DELETE' | translate }}</span>
+                </button>
+                }
+              </div>
+            </td>
+          </tr>
+          }
           }
         </tbody>
       </table>
     </div>
 
     <!-- Common Reusable Pagination Component -->
-    <app-pagination
-      [total]="totalCount()"
-      [page]="currentPage()"
-      [limit]="pageSize()"
-      [pageSizeOptions]="[5, 10, 25, 50]"
-      (pageChange)="onPageChange($event)"
-      (limitChange)="onLimitChange($event)">
+    <app-pagination [total]="totalCount()" [page]="currentPage()" [limit]="pageSize()"
+      [pageSizeOptions]="[5, 10, 25, 50]" (pageChange)="onPageChange($event)" (limitChange)="onLimitChange($event)">
     </app-pagination>
   </div>
 
   <!-- Create / Edit User Modal Dialog -->
   @if (isModalOpen()) {
-    <div class="modal-overlay" (click)="closeModal()">
-      <div class="modal-card" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3 class="modal-title">{{ isEditMode() ? ('EDIT' | translate) + ' User' : ('CREATE' | translate) }}</h3>
-          <button class="icon-btn close-modal" (click)="closeModal()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ isEditMode() ? (('EDIT' | translate) + ' User') : ('ADD_USER_BTN' | translate) }}
+        </h3>
+        <button class="icon-btn close-modal" (click)="closeModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal In-Form Error Alert -->
+      @if (modalError()) {
+      <div class="modal-error-alert">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>{{ modalError() }}</span>
+      </div>
+      }
+
+      <form (ngSubmit)="saveUser()" class="modal-form">
+        <!-- Avatar Uploader Box with Live Preview -->
+        <div class="avatar-upload-row">
+          <div class="avatar-preview-box">
+            @if (imagePreview() || formData().image) {
+            <img [src]="getImageUrl(imagePreview() || formData().image)" alt="Profile" class="avatar-preview-img" />
+            } @else {
+            <div class="avatar-placeholder">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            }
+          </div>
+          <div class="avatar-upload-actions">
+            <label class="btn btn-outline btn-sm upload-file-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <span>{{ (imagePreview() || formData().image) ? ('CHANGE_AVATAR' | translate) : ('UPLOAD_AVATAR' |
+                translate) }}</span>
+              <input type="file" accept="image/png,image/jpeg,image/webp,image/jpg" (change)="onFileSelected($event)"
+                style="display:none;" />
+            </label>
+            @if (imagePreview() || formData().image) {
+            <button type="button" class="btn btn-ghost btn-sm text-danger" (click)="removeImage()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              <span>{{ 'REMOVE_AVATAR' | translate }}</span>
+            </button>
+            }
+          </div>
         </div>
 
-        <!-- Modal In-Form Error Alert -->
-        @if (modalError()) {
-          <div class="modal-error-alert">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            <span>{{ modalError() }}</span>
+        <!-- Row 1: Username & User ID (Auto-Generated 6 Digits - Read Only) -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>{{ 'COL_USERNAME' | translate }} *</label>
+            <input type="text" required [placeholder]="'e.g. Pranisha'" [ngModel]="formData().username"
+              (ngModelChange)="formData.set({ ...formData(), username: $event })" name="username" />
           </div>
-        }
 
-        <form (ngSubmit)="saveUser()" class="modal-form">
-          <!-- Avatar Uploader Box with Live Preview -->
-          <div class="avatar-upload-row">
-            <div class="avatar-preview-box">
-              @if (imagePreview() || formData().image) {
-                <img [src]="getImageUrl(imagePreview() || formData().image)" alt="Profile" class="avatar-preview-img" />
-              } @else {
-                <div class="avatar-placeholder">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                  </svg>
-                </div>
-              }
-            </div>
-            <div class="avatar-upload-actions">
-              <label class="btn btn-outline btn-sm upload-file-btn">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="17 8 12 3 7 8"></polyline>
-                  <line x1="12" y1="3" x2="12" y2="15"></line>
+          <div class="form-group">
+            <label>{{ 'COL_USER_ID' | translate }}</label>
+            <div class="user-id-input-group">
+              <input type="text" readonly maxlength="6" class="user-id-input readonly-input"
+                [placeholder]="'USER_ID_PLACEHOLDER' | translate" [ngModel]="formData().user_id" name="user_id"
+                title="Auto-generated 6-digit User ID (Read-only)" />
+              @if(!isEditMode()){
+              <button type="button" class="refresh-code-btn" (click)="regenerateUserId()"
+                title="Generate new 6-digit random User ID">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <polyline points="1 20 1 14 7 14"></polyline>
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
                 </svg>
-                <span>{{ (imagePreview() || formData().image) ? ('CHANGE_AVATAR' | translate) : ('UPLOAD_AVATAR' | translate) }}</span>
-                <input type="file" accept="image/png,image/jpeg,image/webp,image/jpg" (change)="onFileSelected($event)" style="display:none;" />
-              </label>
-              @if (imagePreview() || formData().image) {
-                <button type="button" class="btn btn-ghost btn-sm text-danger" (click)="removeImage()">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                  <span>{{ 'REMOVE_AVATAR' | translate }}</span>
-                </button>
+              </button>
               }
             </div>
           </div>
+        </div>
 
-          <div class="form-row-2">
-            <div class="form-group">
-              <label>{{ 'COL_USERNAME' | translate }} *</label>
-              <input 
-                type="text" 
-                required
-                [placeholder]="'e.g. johndoe'"
-                [ngModel]="formData().username" 
-                (ngModelChange)="formData.set({ ...formData(), username: $event })"
-                name="username" />
-            </div>
+        <!-- Row 2: Email (Optional but validated) -->
+        <div class="form-group">
+          <label>
+            {{ 'COL_EMAIL' | translate }}
+            <span class="optional-badge">(optional - valid email required if entered)</span>
+          </label>
+          <input type="email" [placeholder]="'pranisha@gmail.com'" [ngModel]="formData().email"
+            (ngModelChange)="formData.set({ ...formData(), email: $event })" name="email" />
+        </div>
 
-            <div class="form-group">
-              <label>{{ 'COL_EMAIL' | translate }} *</label>
-              <input 
-                type="email" 
-                required
-                [placeholder]="'e.g. john@example.com'"
-                [ngModel]="formData().email" 
-                (ngModelChange)="formData.set({ ...formData(), email: $event })"
-                name="email" />
-            </div>
+        <!-- Row 3: Address * (Paragraph field with 3-line input height) -->
+        <div class="form-group">
+          <label>{{ 'COL_ADDRESS' | translate }} *</label>
+          <textarea rows="3" required class="form-textarea" [placeholder]="'ADDRESS_PLACEHOLDER' | translate"
+            [ngModel]="formData().address" (ngModelChange)="formData.set({ ...formData(), address: $event })"
+            name="address"></textarea>
+        </div>
+
+        <!-- Row 4: Mobile Number with Flag Selection Library & Country Validation (Optional, numbers only) -->
+        <div class="form-group">
+          <label>
+            {{ 'COL_MOBILE' | translate }} *
+          </label>
+          <div class="iti-wrapper">
+            <input #mobileInput type="tel" class="iti-phone-input" (keypress)="allowOnlyNumbers($event)"
+              (input)="onPhoneInput($event)" [placeholder]="'MOBILE_PLACEHOLDER' | translate"
+              name="mobile_number_input" />
           </div>
+        </div>
 
-          <div class="form-row-2">
-            <div class="form-group">
-              <label>{{ 'COL_EMPLOYEE_ID' | translate }}</label>
-              <input 
-                type="text" 
-                [placeholder]="'EMPLOYEE_ID_PLACEHOLDER' | translate"
-                [ngModel]="formData().employee_id" 
-                (ngModelChange)="formData.set({ ...formData(), employee_id: $event })"
-                name="employee_id" />
-            </div>
-
-            <div class="form-group">
-              <label>{{ 'COL_PLANT' | translate }}</label>
-              <select 
-                [ngModel]="formData().plant_id" 
-                (ngModelChange)="onPlantSelected($event)"
-                name="plant_id">
-                <option value="">{{ 'SELECT_PLANT' | translate }}</option>
-                @for (plant of plantsList(); track plant.plant_id) {
-                  <option [value]="plant.plant_id">{{ plant.plant_name }} ({{ plant.plant_id }})</option>
-                }
-              </select>
-            </div>
+        <!-- Row 5: Alternative Mobile Number with Flag Selection (Optional, numbers only) -->
+        <div class="form-group">
+          <label>
+            {{ 'COL_ALT_MOBILE' | translate }}
+            <span class="optional-badge">(optional - select flag &amp; enter valid phone)</span>
+          </label>
+          <div class="iti-wrapper">
+            <input #altMobileInput type="tel" class="iti-phone-input" (keypress)="allowOnlyNumbers($event)"
+              (input)="onPhoneInput($event)" [placeholder]="'MOBILE_PLACEHOLDER' | translate"
+              name="alt_mobile_number_input" />
           </div>
+        </div>
 
-          <div class="form-row-2">
-            <div class="form-group">
-              <label>{{ 'PASSWORD_LABEL' | translate }} {{ isEditMode() ? '(Leave blank to keep unchanged)' : '*' }}</label>
-              <input 
-                type="password" 
-                [required]="!isEditMode()"
-                [placeholder]="isEditMode() ? '••••••••' : 'Enter strong password'"
-                [ngModel]="formData().password" 
-                (ngModelChange)="formData.set({ ...formData(), password: $event })"
-                name="password" />
-            </div>
-
-            <div class="form-group">
-              <label>{{ 'COL_ROLE' | translate }}</label>
-              <select 
-                [ngModel]="formData().role" 
-                (ngModelChange)="formData.set({ ...formData(), role: $event })"
-                name="role">
-                <option value="USER">USER</option>
-                <option value="ADMIN">ADMIN</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="modal-actions">
-            <button type="button" class="btn btn-secondary" (click)="closeModal()">{{ 'CANCEL' | translate }}</button>
-            <button type="submit" class="btn btn-primary" [disabled]="isLoading() || isUploadingImage()">
-              {{ isEditMode() ? ('SAVE' | translate) : ('CREATE' | translate) }}
-            </button>
-          </div>
-        </form>
-      </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">{{ 'CANCEL' | translate }}</button>
+          <button type="submit" class="btn btn-primary" [disabled]="isLoading() || isUploadingImage()">
+            {{ isEditMode() ? ('SAVE' | translate) : ('CREATE' | translate) }}
+          </button>
+        </div>
+      </form>
     </div>
+  </div>
   }
 
   <!-- Delete Confirmation Modal -->
   @if (isDeleteConfirmOpen()) {
-    <div class="modal-overlay" (click)="cancelDelete()">
-      <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3 class="modal-title">{{ 'CONFIRM_DELETE_TITLE' | translate }}</h3>
-          <button class="icon-btn close-modal" (click)="cancelDelete()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p>{{ 'CONFIRM_DELETE_MSG' | translate }}</p>
-          <p class="delete-user-target"><strong>{{ userToDelete()?.username }}</strong> ({{ userToDelete()?.email }})</p>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" (click)="cancelDelete()">{{ 'CANCEL' | translate }}</button>
-          <button type="button" class="btn btn-danger" (click)="executeDelete()" [disabled]="isLoading()">
-            {{ 'DELETE' | translate }}
-          </button>
-        </div>
+  <div class="modal-overlay" (click)="cancelDelete()">
+    <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ 'CONFIRM_DELETE_TITLE' | translate }}</h3>
+        <button class="icon-btn close-modal" (click)="cancelDelete()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{ 'CONFIRM_DELETE_MSG' | translate }}</p>
+        <p class="delete-user-target"><strong>{{ userToDelete()?.username }}</strong> ({{ userToDelete()?.user_id ||
+          userToDelete()?.employee_id || userToDelete()?.email || 'User' }})</p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancelDelete()">{{ 'CANCEL' | translate }}</button>
+        <button type="button" class="btn btn-danger" (click)="executeDelete()" [disabled]="isLoading()">
+          {{ 'DELETE' | translate }}
+        </button>
       </div>
     </div>
+  </div>
   }
 </div>

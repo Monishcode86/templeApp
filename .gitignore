@@ -35,3 +35,7 @@ Thumbs.db
 *.ntvs*
 *.njsproj
 *.sln
+
+# Baileys WhatsApp Session
+.baileys_auth/
+api/.baileys_auth/

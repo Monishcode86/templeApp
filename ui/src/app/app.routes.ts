@@ -29,39 +29,13 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/users/users.component').then((m) => m.UsersComponent),
       },
       {
-        path: 'plants',
-        loadComponent: () =>
-          import('./pages/plants/plants.component').then((m) => m.PlantsComponent),
+        path: 'donations',
+        loadComponent: () => import('./pages/donations/donations.component').then((m) => m.DonationsComponent),
       },
       {
-        path: 'shifts',
-        loadComponent: () =>
-          import('./pages/shifts/shifts.component').then((m) => m.ShiftsComponent),
-      },
-      {
-        path: 'departments',
-        loadComponent: () =>
-          import('./pages/departments/departments.component').then((m) => m.DepartmentsComponent),
-      },
-      {
-        path: 'parts',
-        loadComponent: () => import('./pages/parts/parts.component').then((m) => m.PartsComponent),
-      },
-      {
-        path: 'downtime',
-        loadComponent: () =>
-          import('./pages/downtime/downtime.component').then((m) => m.DowntimeComponent),
-      },
-      {
-        path: 'machinetype',
-        loadComponent: () =>
-          import('./pages/machinetype/machinetype.component').then((m) => m.MachineTypeComponent),
-      },
-      {
-        path: 'machines',
-        loadComponent: () =>
-          import('./pages/machines/machines.component').then((m) => m.MachinesComponent),
-      },
+        path: 'notifications',
+        loadComponent: () => import('./pages/notifications/notifications.component').then((m) => m.NotificationsComponent),
+      }
     ],
   },
   {
