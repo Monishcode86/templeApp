@@ -43,7 +43,7 @@ export class DonationService {
   /**
    * Update a donation (only type and remarks)
    */
-  updateDonation(id: string, data: { type?: string; remarks?: string | null }): Observable<ApiResponse<Donation>> {
+  updateDonation(id: string, data: Partial<Donation>): Observable<ApiResponse<Donation>> {
     return this.api.put<ApiResponse<Donation>>(`/donation/${id}`, data);
   }
 

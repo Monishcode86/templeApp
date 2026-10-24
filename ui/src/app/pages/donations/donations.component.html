@@ -7,72 +7,119 @@
     </div>
     <div class="header-actions">
       @if (authService.isAdmin()) {
-      <button class="btn btn-primary" (click)="openAddModal()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        <span>{{ 'DON_ADD_BTN' | translate }}</span>
-      </button>
+        <button class="btn btn-primary" (click)="openAddModal()" id="btn-add-donation">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>{{ 'DON_ADD_BTN' | translate }}</span>
+        </button>
       }
     </div>
   </div>
 
   <!-- Toast Alerts -->
   @if (successMessage()) {
-  <div class="toast-alert toast-success">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-      <polyline points="22 4 12 14.01 9 11.01"></polyline>
-    </svg>
-    <span>{{ successMessage() }}</span>
-  </div>
+    <div class="toast-alert toast-success">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <span>{{ successMessage() }}</span>
+    </div>
   }
   @if (errorMessage()) {
-  <div class="toast-alert toast-error">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="12" r="10"></circle>
-      <line x1="12" y1="8" x2="12" y2="12"></line>
-      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-    </svg>
-    <span>{{ errorMessage() }}</span>
-  </div>
+    <div class="toast-alert toast-error">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ errorMessage() }}</span>
+    </div>
   }
 
   <!-- Toolbar -->
   <div class="toolbar-card">
     <div class="toolbar-left-group">
-      <!-- Search -->
+      <!-- Search (receipt no, donor, phone, upi, cheque, user_id) -->
       <div class="search-input-wrapper">
-        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          class="search-icon"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <input type="text" [placeholder]="'DON_SEARCH_PLACEHOLDER' | translate" [ngModel]="searchQuery()"
-          (ngModelChange)="onSearchChange($event)" />
+        <input
+          type="text"
+          [placeholder]="'DON_SEARCH_PLACEHOLDER' | translate"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchChange($event)"
+        />
         @if (searchQuery()) {
-        <button type="button" class="clear-search-btn" (click)="clearSearch()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
+          <button type="button" class="clear-search-btn" (click)="clearSearch()">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         }
       </div>
 
       <!-- Type Filter -->
       <div class="filter-select-wrapper">
-        <select class="filter-select" [ngModel]="filterType()" (ngModelChange)="onTypeFilterChange($event)">
+        <select
+          class="filter-select"
+          [ngModel]="filterType()"
+          (ngModelChange)="onTypeFilterChange($event)"
+        >
           <option value="">{{ 'DON_ALL_TYPES' | translate }}</option>
-          <option value="UPI">UPI</option>
           <option value="Cash">{{ 'DON_TYPE_CASH' | translate }}</option>
+          <option value="UPI">UPI</option>
           <option value="Cheque">{{ 'DON_TYPE_CHEQUE' | translate }}</option>
         </select>
       </div>
     </div>
 
     <div class="toolbar-stats">
-      <span>{{ 'DON_SHOWING' | translate }} <strong>{{ donationsList().length }}</strong> {{ 'DON_OF' | translate }} {{ totalCount() }}</span>
+      <span
+        >{{ 'DON_SHOWING' | translate }} <strong>{{ donationsList().length }}</strong>
+        {{ 'DON_OF' | translate }} {{ totalCount() }}</span
+      >
     </div>
   </div>
 
@@ -82,309 +129,824 @@
       <table class="data-table">
         <thead>
           <tr>
+            <th>{{ formLanguage() === 'ta' ? 'ரசீது எண்' : 'Receipt No' }}</th>
             <th>{{ 'DON_COL_USER' | translate }}</th>
             <th>{{ 'DON_COL_TYPE' | translate }}</th>
             <th>{{ 'DON_COL_AMOUNT' | translate }}</th>
-            <th>{{ 'DON_COL_REMARKS' | translate }}</th>
-            <th>{{ 'DON_COL_WA' | translate }}</th>
             <th>{{ 'DON_COL_DATE' | translate }}</th>
             <th class="text-right">{{ 'COL_ACTIONS' | translate }}</th>
           </tr>
         </thead>
         <tbody>
           @if (donationsList().length === 0) {
-          <tr>
-            <td colspan="7" class="empty-cell">{{ 'DON_NO_RECORDS' | translate }}</td>
-          </tr>
+            <tr>
+              <td colspan="7" class="empty-cell">{{ 'DON_NO_RECORDS' | translate }}</td>
+            </tr>
           } @else {
-          @for (don of donationsList(); track don._id || don.id) {
-          <tr>
-            <!-- User -->
-            <td>
-              <div class="user-cell">
-                <span class="avatar-mini">{{ (don.username || 'U').slice(0, 1).toUpperCase() }}</span>
-                <div class="user-cell-info">
-                  <span class="cell-primary">{{ don.username || '—' }}</span>
-                  <span class="cell-muted user-id-badge-sm">{{ don.user_id }}</span>
-                </div>
-              </div>
-            </td>
-            <!-- Type -->
-            <td>
-              <span class="type-badge type-{{ don.type | lowercase }}">{{ don.type }}</span>
-            </td>
-            <!-- Amount -->
-            <td>
-              <span class="amount-cell">{{ formatAmount(don.amount) }}</span>
-            </td>
-            <!-- Remarks -->
-            <td class="remarks-cell">{{ don.remarks || '—' }}</td>
-            <!-- WhatsApp sent -->
-            <td>
-              @if (don.whatsapp_send) {
-              <span class="wa-badge wa-sent">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                  <path d="M11.998 0C5.372 0 0 5.373 0 12.001c0 2.117.554 4.099 1.523 5.819L.057 23.485a.498.498 0 0 0 .612.612l5.665-1.466A11.943 11.943 0 0 0 11.998 24C18.626 24 24 18.627 24 12.001 24 5.373 18.626 0 11.998 0zm0 21.818a9.82 9.82 0 0 1-5.004-1.366l-.359-.214-3.722.963.993-3.618-.235-.372A9.816 9.816 0 0 1 2.182 12c0-5.415 4.402-9.817 9.816-9.817 5.414 0 9.817 4.402 9.817 9.817 0 5.414-4.403 9.818-9.817 9.818z"/>
-                </svg>
-                {{ 'DON_WA_SENT' | translate }}
-              </span>
-              } @else {
-              <span class="wa-badge wa-pending">{{ 'DON_WA_PENDING' | translate }}</span>
-              }
-            </td>
-            <!-- Date -->
-            <td class="cell-muted">{{ formatDate(don.date || don.createdAt) }}</td>
-            <!-- Actions -->
-            <td class="text-right">
-              <div class="action-buttons">
-                <button type="button" class="action-btn edit-btn" (click)="openEditModal(don)" [title]="'EDIT' | translate">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                  </svg>
-                  <span class="btn-text">{{ 'EDIT' | translate }}</span>
-                </button>
-                <button type="button" class="action-btn delete-btn" (click)="confirmDelete(don)" [title]="'DELETE' | translate">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  </svg>
-                  <span class="btn-text">{{ 'DELETE' | translate }}</span>
-                </button>
-              </div>
-            </td>
-          </tr>
-          }
+            @for (don of donationsList(); track don._id || don.id) {
+              <tr>
+                <!-- Receipt Number (Financial Year Based) -->
+                <td>
+                  <span class="receipt-badge">
+                    <span>{{ don.receipt_no || '#' + (don.receipt_no || '—') }}</span>
+                  </span>
+                </td>
+
+                <!-- User / Donor -->
+                <td>
+                  <div class="user-cell">
+                    <span class="avatar-mini">{{
+                      (don.donor_name || don.username || 'U').slice(0, 1).toUpperCase()
+                    }}</span>
+                    <div class="user-cell-info">
+                      <span class="cell-primary">{{ don.donor_name || don.username || '—' }}</span>
+                      <div class="donor-subinfo">
+                        @if (don.donor_mobile) {
+                          <span class="cell-muted phone-pill">{{ don.donor_mobile }}</span>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Type & Reference -->
+                <td>
+                  <div class="type-cell">
+                    <span class="type-badge type-{{ don.type | lowercase }}">{{ don.type }}</span>
+                    @if (don.type === 'UPI' && don.upi_ref_no) {
+                      <span class="ref-subtext">Ref: {{ don.upi_ref_no }}</span>
+                    }
+                    @if (don.type === 'Cheque' && don.cheque_no) {
+                      <span class="ref-subtext"
+                        >Chq: {{ don.cheque_no
+                        }}{{ don.bank_name ? ' (' + don.bank_name + ')' : '' }}</span
+                      >
+                    }
+                  </div>
+                </td>
+
+                <!-- Amount -->
+                <td>
+                  <span class="amount-cell">{{ formatAmount(don.amount) }}</span>
+                </td>
+
+                <!-- Date -->
+                <td class="cell-muted">{{ formatDate(don.date || don.createdAt) }}</td>
+
+                <!-- Actions -->
+                <td class="text-right">
+                  <div class="action-buttons">
+                    <!-- View / Print Receipt -->
+                    <button
+                      type="button"
+                      class="action-btn receipt-btn"
+                      (click)="openReceiptModal(don)"
+                      title="View & Print Receipt"
+                    >
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.2"
+                      >
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                      </svg>
+                      <span class="btn-text">Receipt</span>
+                    </button>
+
+                    <!-- Edit -->
+                    <button
+                      type="button"
+                      class="action-btn edit-btn"
+                      (click)="openEditModal(don)"
+                      [title]="'EDIT' | translate"
+                    >
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.2"
+                      >
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                      <span class="btn-text">{{ 'EDIT' | translate }}</span>
+                    </button>
+
+                    <!-- Delete -->
+                    <button
+                      type="button"
+                      class="action-btn delete-btn"
+                      (click)="confirmDelete(don)"
+                      [title]="'DELETE' | translate"
+                    >
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.2"
+                      >
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path
+                          d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                        ></path>
+                      </svg>
+                      <span class="btn-text">{{ 'DELETE' | translate }}</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
           }
         </tbody>
       </table>
     </div>
 
-    <app-pagination [total]="totalCount()" [page]="currentPage()" [limit]="pageSize()"
-      [pageSizeOptions]="[5, 10, 25, 50]" (pageChange)="onPageChange($event)" (limitChange)="onLimitChange($event)">
+    <app-pagination
+      [total]="totalCount()"
+      [page]="currentPage()"
+      [limit]="pageSize()"
+      [pageSizeOptions]="[5, 10, 25, 50]"
+      (pageChange)="onPageChange($event)"
+      (limitChange)="onLimitChange($event)"
+    >
     </app-pagination>
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════════
-       ADD / EDIT MODAL
+       TRADITIONAL RECEIPT FORM MODAL (Add / Edit)
   ═══════════════════════════════════════════════════════════════ -->
   @if (isModalOpen()) {
-  <div class="modal-overlay" (click)="closeModal()">
-    <div class="modal-card" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3 class="modal-title">
-          {{ isEditMode() ? (('EDIT' | translate) + ' ' + ('DON_HEADING' | translate)) : ('DON_ADD_BTN' | translate) }}
-        </h3>
-        <button class="icon-btn close-modal" (click)="closeModal()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-
-      @if (modalError()) {
-      <div class="modal-error-alert">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        <span>{{ modalError() }}</span>
-      </div>
-      }
-
-      <!-- Edit-mode notice banner -->
-      @if (isEditMode()) {
-      <div class="edit-notice">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        <span>{{ 'DON_EDIT_NOTICE' | translate }}</span>
-      </div>
-      }
-
-      <form (ngSubmit)="submitForm()" class="modal-form">
-
-        <!-- User Select (disabled in edit mode) -->
-        <div class="form-group">
-          <label>{{ 'DON_COL_USER' | translate }} *</label>
-          @if (isEditMode()) {
-          <input type="text" class="readonly-input" readonly
-            [value]="(formData().username || '') + ' (' + formData().user_id + ')'" />
-          } @else {
-          <select class="form-select" required [ngModel]="formData().user_id" name="user_select"
-            (ngModelChange)="onUserSelect($event)">
-            <option value="">{{ 'DON_SELECT_USER' | translate }}</option>
-            @for (u of usersList(); track u._id) {
-            <option [value]="u.user_id || u._id">
-              {{ u.username }} ({{ u.user_id || u._id }})
-            </option>
-            }
-          </select>
-          }
-        </div>
-
-        <!-- Date & Donation Type -->
-        <div class="form-row-2">
-          <!-- Date (disabled in edit mode) -->
-          <div class="form-group">
-            <label>{{ 'DON_COL_DATE' | translate }} *</label>
-            <input type="date" class="form-input"
-              [class.readonly-input]="isEditMode()"
-              [disabled]="isEditMode()"
-              required
-              [ngModel]="formData().date" name="date"
-              (ngModelChange)="formData.update(f => ({ ...f, date: $event }))" />
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal-card receipt-modal-card" (click)="$event.stopPropagation()">
+        <!-- Modal Top Bar -->
+        <div class="receipt-modal-top-bar">
+          <div class="modal-top-heading">
+            <h2 class="voucher-modal-title">
+              {{ isEditMode() ? 'நன்கொடை விவரங்களைத் திருத்துக' : 'நன்கொடை ரசீது பதிவு' }}
+            </h2>
           </div>
 
-          <!-- Donation Type -->
-          <div class="form-group">
-            <label>{{ 'DON_COL_TYPE' | translate }} *</label>
-            <select class="form-select" required [ngModel]="formData().type" name="type"
-              (ngModelChange)="formData.update(f => ({ ...f, type: $event }))">
-              @for (t of donationTypes; track t) {
-              <option [value]="t">{{ t }}</option>
-              }
-            </select>
-          </div>
-        </div>
-
-        <!-- Amount (disabled in edit mode) -->
-        <div class="form-group">
-          <label>{{ 'DON_COL_AMOUNT' | translate }} *</label>
-          <div class="amount-input-wrapper">
-            <span class="amount-prefix">₹</span>
-            <input type="number" min="0.01" step="0.01" class="amount-input"
-              [class.readonly-input]="isEditMode()"
-              [readonly]="isEditMode()"
-              [disabled]="isEditMode()"
-              [placeholder]="'0.00'"
-              [ngModel]="formData().amount" name="amount"
-              (ngModelChange)="formData.update(f => ({ ...f, amount: $event }))" />
-          </div>
-        </div>
-
-        <!-- Remarks -->
-        <div class="form-group">
-          <label>
-            {{ 'DON_COL_REMARKS' | translate }}
-            <span class="optional-badge">({{ 'DON_OPTIONAL' | translate }})</span>
-          </label>
-          <textarea rows="2" class="form-textarea"
-            [placeholder]="'DON_REMARKS_PLACEHOLDER' | translate"
-            [ngModel]="formData().remarks" name="remarks"
-            (ngModelChange)="formData.update(f => ({ ...f, remarks: $event }))"></textarea>
-        </div>
-
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" (click)="closeModal()">{{ 'CANCEL' | translate }}</button>
-          <button type="submit" class="btn btn-primary" [disabled]="isLoading()">
-            {{ isEditMode() ? ('SAVE' | translate) : ('DON_PREVIEW_BTN' | translate) }}
+          <button class="icon-btn close-modal" (click)="closeModal()" title="Close">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
           </button>
         </div>
-      </form>
-    </div>
-  </div>
-  }
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       CONFIRMATION POPUP (Add only — shows before save)
-  ═══════════════════════════════════════════════════════════════ -->
-  @if (isConfirmModalOpen()) {
-  <div class="modal-overlay">
-    <div class="modal-card modal-confirm" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3 class="modal-title">{{ 'DON_CONFIRM_TITLE' | translate }}</h3>
-      </div>
-
-      <div class="confirm-body">
-        <p class="confirm-intro">{{ 'DON_CONFIRM_INTRO' | translate }}</p>
-
-        @if (pendingPayload()) {
-        <div class="confirm-details-card">
-          <div class="confirm-row">
-            <span class="confirm-label">{{ 'DON_COL_USER' | translate }}</span>
-            <span class="confirm-value">{{ pendingPayload()!.username }} <em class="confirm-id">({{ pendingPayload()!.user_id }})</em></span>
+        @if (modalError()) {
+          <div class="modal-error-alert">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>{{ modalError() }}</span>
           </div>
-          <div class="confirm-row">
-            <span class="confirm-label">{{ 'DON_COL_TYPE' | translate }}</span>
-            <span class="confirm-value">
-              <span class="type-badge type-{{ pendingPayload()!.type | lowercase }}">{{ pendingPayload()!.type }}</span>
-            </span>
-          </div>
-          <div class="confirm-row">
-            <span class="confirm-label">{{ 'DON_COL_DATE' | translate }}</span>
-            <span class="confirm-value">{{ formatDate(pendingPayload()!.date) }}</span>
-          </div>
-          <div class="confirm-row">
-            <span class="confirm-label">{{ 'DON_COL_AMOUNT' | translate }}</span>
-            <span class="confirm-value amount-highlight">{{ formatAmount(pendingPayload()!.amount!) }}</span>
-          </div>
-          @if (pendingPayload()!.remarks) {
-          <div class="confirm-row">
-            <span class="confirm-label">{{ 'DON_COL_REMARKS' | translate }}</span>
-            <span class="confirm-value">{{ pendingPayload()!.remarks }}</span>
-          </div>
-          }
-        </div>
         }
-      </div>
 
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" (click)="backToForm()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-          {{ 'DON_BACK_TO_FORM' | translate }}
-        </button>
-        <button type="button" class="btn btn-primary" [disabled]="isLoading()" (click)="confirmAndSave()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          {{ 'DON_CONFIRM_SAVE' | translate }}
-        </button>
+        <form (ngSubmit)="submitForm()">
+          <!-- ═══ TRADITIONAL RECEIPT SLIP FRAME (Matching User Image) ═══ -->
+          <div class="traditional-receipt-frame">
+            <div class="traditional-receipt-inner">
+              <!-- 1. Header Section: Deity Emblem + Temple Titles -->
+              <div class="receipt-header-row">
+                <!-- Left Gopuram Shrine Emblem from public/tempEmb.jpeg -->
+                <div class="temple-emblem-wrapper">
+                  <img src="/tempEmb.jpeg" alt="Temple Deity Emblem" class="temple-emblem-img" />
+                </div>
+
+                <!-- Center Temple Titles -->
+                <div class="temple-titles">
+                  <div class="temple-subname">
+                    {{
+                      formLanguage() === 'ta'
+                        ? 'எரிவிண்ணார் ஸ்ரீ வேணுகோபால்சாமி நாயுடு'
+                        : 'Erivinnar Sri Venugopalsamy Naidu'
+                    }}
+                  </div>
+                  <div class="temple-mainname">
+                    {{
+                      formLanguage() === 'ta'
+                        ? 'ஸ்ரீ கொண்டம்மாள் / ஏண்டம்மாள் திருக்கோவில்கள்'
+                        : 'SRI KONDAMMAL / ENDAMMAL TEMPLES'
+                    }}
+                  </div>
+                  <div class="temple-address">
+                    {{
+                      formLanguage() === 'ta'
+                        ? 'கள்ளப்பாளையம் அஞ்சல், செட்டிபாளையம் வழி, கோயமுத்தூர் - 641 201.'
+                        : 'Kallapalayam Post, Chettipalayam Via, Coimbatore - 641 201.'
+                    }}
+                  </div>
+                </div>
+
+                <!-- Right spacer to keep temple titles optically centered -->
+                <div class="temple-emblem-spacer" aria-hidden="true"></div>
+              </div>
+
+              <!-- 2. Center Banner: In place of ரசீது, Payment Type Selection Dropdown [Cash | UPI | Cheque] -->
+              <div class="receipt-type-center-box">
+                <div class="receipt-type-dropdown-wrapper">
+                  <select
+                    class="receipt-type-select"
+                    [ngModel]="formData().type"
+                    (ngModelChange)="setPaymentType($event)"
+                    name="payment_type"
+                    id="receipt-payment-type-select"
+                  >
+                    <option value="Cash">
+                      {{ formLanguage() === 'ta' ? 'ரொக்கம் (Cash)' : 'Cash' }}
+                    </option>
+                    <option value="UPI">UPI</option>
+                    <option value="Cheque">
+                      {{ formLanguage() === 'ta' ? 'காசோலை (Cheque)' : 'Cheque' }}
+                    </option>
+                  </select>
+                  <span class="dropdown-chevron">▼</span>
+                </div>
+              </div>
+
+              <!-- 3. Top Line: Date Field (Right-aligned, Receipt No handled in backend) -->
+              <div class="receipt-line receipt-line-date">
+                <div class="receipt-date-group">
+                  <span class="receipt-label">{{
+                    formLanguage() === 'ta' ? 'தேதி :' : 'Date :'
+                  }}</span>
+                  <input
+                    type="date"
+                    class="receipt-inline-input date-input"
+                    [ngModel]="formData().date"
+                    name="date"
+                    [disabled]="isEditMode()"
+                    required
+                    (ngModelChange)="formData.update((f) => ({ ...f, date: $event }))"
+                  />
+                </div>
+              </div>
+
+              <!-- 4. Line 1: உயர்திரு. (Head User Name Field with Search Dropdown) -->
+              <div class="receipt-line receipt-line-donor">
+                <span class="receipt-label-thiru">{{
+                  formLanguage() === 'ta' ? 'உயர்திரு.' : 'Thiru / Mr. / Ms.'
+                }}</span>
+                <div class="user-search-container">
+                  @if (isEditMode()) {
+                    <input
+                      type="text"
+                      class="receipt-dotted-input readonly-style"
+                      readonly
+                      [value]="formData().donor_name || formData().username"
+                    />
+                  } @else {
+                    <div class="combobox-wrapper">
+                      <input
+                        type="text"
+                        class="receipt-dotted-input combobox-input"
+                        name="donor_name"
+                        [placeholder]="
+                          formLanguage() === 'ta'
+                            ? 'பெயரை உள்ளிடவும் அல்லது தேர்ந்தெடுக்கவும்...'
+                            : 'Enter or select name...'
+                        "
+                        [value]="formData().donor_name"
+                        (input)="onUserSearchInput($any($event.target).value)"
+                        (focus)="openUserDropdown()"
+                        (click)="openUserDropdown()"
+                        autocomplete="off"
+                      />
+
+                      @if (formData().donor_name) {
+                        <button
+                          type="button"
+                          class="combobox-clear-btn"
+                          (click)="clearSelectedUser($event)"
+                          title="Clear name"
+                        >
+                          ✕
+                        </button>
+                      } @else {
+                        <button
+                          type="button"
+                          class="combobox-arrow-btn"
+                          (click)="toggleUserDropdown($event)"
+                          title="Select user"
+                        >
+                          ▼
+                        </button>
+                      }
+                    </div>
+
+                    <!-- Dropdown list -->
+                    @if (isUserDropdownOpen()) {
+                      <div class="user-combobox-dropdown">
+                        @if (filteredUsers().length === 0) {
+                          <div class="dropdown-empty">
+                            {{
+                              formLanguage() === 'ta'
+                                ? 'பயனர்கள் எவரும் பொருந்தவில்லை.'
+                                : 'No users match your search.'
+                            }}
+                          </div>
+                        } @else {
+                          @for (u of filteredUsers(); track u._id || u.user_id) {
+                            <div
+                              class="user-dropdown-item"
+                              (mousedown)="selectHeadUser(u, $event)"
+                              (click)="selectHeadUser(u, $event)"
+                            >
+                              <div class="item-main">
+                                <strong class="item-name">{{ u.username }}</strong>
+                                <span class="item-badge">{{ u.user_id || u._id }}</span>
+                              </div>
+                              <div class="item-details">
+                                @if (u.mobile_number) {
+                                  <span class="item-phone">📞 {{ u.mobile_number }}</span>
+                                }
+                                @if (u.email) {
+                                  <span class="item-email">✉️ {{ u.email }}</span>
+                                }
+                              </div>
+                            </div>
+                          }
+                        }
+                      </div>
+                    }
+                  }
+                </div>
+              </div>
+
+              <!-- 5. Line 2: அவர்களிடமிருந்து ரூபாய் (Amount in Words) -->
+              <div class="receipt-line receipt-line-words">
+                <span class="receipt-label">{{
+                  formLanguage() === 'ta' ? 'அவர்களிடமிருந்து ரூபாய்' : 'Received from them Rupees'
+                }}</span>
+                <div class="receipt-dotted-underline words-display">
+                  <span class="words-text">{{ amountInWords() }}</span>
+                </div>
+              </div>
+
+              <!-- 6. Line 3: முதலீட்டு நிதி (Corpus Fund) காக + Payment Mode Reference -->
+              <div class="receipt-line receipt-line-purpose">
+                <span class="receipt-label">
+                  {{
+                    formLanguage() === 'ta'
+                      ? 'முதலீட்டு நிதி (Corpus Fund) காக'
+                      : 'Towards Corpus Fund as'
+                  }}
+                </span>
+
+                <!-- Mode specific details -->
+                @if (formData().type === 'UPI') {
+                  <div class="mode-input-group">
+                    <span class="mode-inline-label">{{
+                      formLanguage() === 'ta' ? 'UPI குறிப்பு எண் (Ref No) :' : 'UPI Ref No :'
+                    }}</span>
+                    <input
+                      type="text"
+                      class="receipt-dotted-input ref-input"
+                      required
+                      [placeholder]="
+                        formLanguage() === 'ta'
+                          ? 'UPI / UTR பரிவர்த்தனை எண்'
+                          : 'UPI Reference / UTR Number *'
+                      "
+                      [ngModel]="formData().upi_ref_no"
+                      name="upi_ref_no"
+                      (ngModelChange)="formData.update((f) => ({ ...f, upi_ref_no: $event }))"
+                    />
+                  </div>
+                }
+
+                @if (formData().type === 'Cheque') {
+                  <div class="mode-input-group">
+                    <span class="mode-inline-label">{{
+                      formLanguage() === 'ta' ? 'காசோலை எண் :' : 'Cheque No :'
+                    }}</span>
+                    <input
+                      type="text"
+                      class="receipt-dotted-input ref-input"
+                      required
+                      [placeholder]="formLanguage() === 'ta' ? 'காசோலை எண்' : 'Cheque Number *'"
+                      [ngModel]="formData().cheque_no"
+                      name="cheque_no"
+                      (ngModelChange)="formData.update((f) => ({ ...f, cheque_no: $event }))"
+                    />
+                  </div>
+                }
+
+                @if (formData().type === 'Cash') {
+                  <div class="receipt-dotted-underline cash-underline">
+                    <span class="cash-badge">{{
+                      formLanguage() === 'ta' ? 'ரொக்கம் (Cash)' : 'Cash Payment'
+                    }}</span>
+                  </div>
+                }
+              </div>
+
+              <!-- 7. Line 4: வங்கி [ remark input ] யாக பெறப்பட்டது. -->
+              <div class="receipt-line receipt-line-bank">
+                <span class="receipt-label">{{ formLanguage() === 'ta' ? 'வங்கி' : 'Bank' }}</span>
+                <input
+                  type="text"
+                  class="receipt-dotted-input bank-remarks-input"
+                  name="remarks"
+                  [placeholder]="
+                    formLanguage() === 'ta'
+                      ? 'குறிப்புகள் / விவரங்களை உள்ளிடவும்...'
+                      : 'Remark / details...'
+                  "
+                  [ngModel]="formData().remarks"
+                  (ngModelChange)="onRemarksChange($event)"
+                />
+                <span class="receipt-label-end">{{
+                  formLanguage() === 'ta' ? 'யாக பெறப்பட்டது.' : 'received.'
+                }}</span>
+              </div>
+
+              <!-- 8. Line 5: செல்போன் எண் (Mobile Number - Readonly) -->
+              <div class="receipt-line receipt-line-mobile">
+                <span class="receipt-label">{{
+                  formLanguage() === 'ta' ? 'செல்போன் எண் :' : 'Mobile No :'
+                }}</span>
+                <input
+                  type="text"
+                  class="receipt-dotted-input mobile-input readonly-style"
+                  readonly
+                  [placeholder]="
+                    formLanguage() === 'ta' ? '10 இலக்க கைபேசி எண்' : '10-digit mobile number'
+                  "
+                  [value]="formData().donor_mobile"
+                  name="donor_mobile"
+                />
+              </div>
+
+              <!-- 9. Bottom Row: Amount Box (ரூ. / ₹) + Signatures -->
+              <div class="receipt-bottom-row">
+                <!-- Amount Box (Bordered, Editable) -->
+                <div class="receipt-amount-box">
+                  <span class="currency-symbol">{{ formLanguage() === 'ta' ? 'ரூ.' : '₹' }}</span>
+                  <input
+                    type="number"
+                    min="1"
+                    max="9999999999"
+                    step="any"
+                    class="receipt-amount-input"
+                    [placeholder]="'0'"
+                    [ngModel]="formData().amount"
+                    name="amount"
+                    (ngModelChange)="onAmountChange($event)"
+                    required
+                  />
+                </div>
+
+                <!-- Signatures -->
+                <div class="receipt-signatures">
+                  <div class="sig-col sig-donor">
+                    <div class="sig-line"></div>
+                    <span class="sig-caption">
+                      {{
+                        formLanguage() === 'ta'
+                          ? 'நன்கொடை செலுத்துபவர் கையெழுத்து'
+                          : "Donor's Signature"
+                      }}
+                    </span>
+                  </div>
+                  <div class="sig-col sig-collector">
+                    <div class="sig-line"></div>
+                    <span class="sig-caption">
+                      {{ formLanguage() === 'ta' ? 'வசூலிப்பவர்' : "Collector's Signature" }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal Actions -->
+          <div class="receipt-form-actions">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">
+              {{ 'CANCEL' | translate }}
+            </button>
+            <button type="submit" class="btn btn-primary btn-save-receipt" [disabled]="isLoading()">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+              >
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              <span>
+                {{
+                  isEditMode()
+                    ? ('SAVE' | translate)
+                    : formLanguage() === 'ta'
+                      ? 'நன்கொடை சேமிக்கவும்'
+                      : 'Save Donation Receipt'
+                }}
+              </span>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
-  </div>
   }
 
   <!-- ═══════════════════════════════════════════════════════════════
-       DELETE CONFIRM
+       RECEIPT VIEW & PRINT MODAL (Ready to print)
+  ═══════════════════════════════════════════════════════════════ -->
+  @if (isReceiptModalOpen() && receiptView()) {
+    <div class="modal-overlay receipt-view-overlay" (click)="closeReceiptModal()">
+      <div class="modal-card receipt-view-card" (click)="$event.stopPropagation()">
+        <!-- Print Bar -->
+        <div class="receipt-view-top-bar no-print">
+          <div class="modal-top-heading">
+            <h2 class="voucher-modal-title">நன்கொடை ரசீது அச்சு முன்னோட்டம்</h2>
+          </div>
+
+          <div class="top-bar-right">
+            <button
+              type="button"
+              class="btn btn-primary btn-download-pdf"
+              (click)="downloadReceiptPdf()"
+              [disabled]="isDownloadingPdf()"
+            >
+              @if (isDownloadingPdf()) {
+                <span class="spinner-sm"></span>
+                <span>PDF தயாராகிறது...</span>
+              } @else {
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>ரசீது PDF பதிவிறக்குக (Download PDF)</span>
+              }
+            </button>
+            <button class="icon-btn close-modal" (click)="closeReceiptModal()" title="Close">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Printable Traditional Receipt Slip -->
+        <div class="traditional-receipt-frame printable-slip" id="printable-receipt-slip">
+          <div class="traditional-receipt-inner">
+            <!-- Header -->
+            <div class="receipt-header-row">
+              <div class="temple-emblem-wrapper">
+                <img src="/tempEmb.jpeg" alt="Temple Deity Emblem" class="temple-emblem-img" />
+              </div>
+              <div class="temple-titles">
+                <div class="temple-subname">
+                  {{
+                    receiptViewLang() === 'ta'
+                      ? 'எரிவிண்ணார் ஸ்ரீ வேணுகோபால்சாமி நாயுடு'
+                      : 'Erivinnar Sri Venugopalsamy Naidu'
+                  }}
+                </div>
+                <div class="temple-mainname">
+                  {{
+                    receiptViewLang() === 'ta'
+                      ? 'ஸ்ரீ கொண்டம்மாள் / ஏண்டம்மாள் திருக்கோவில்கள்'
+                      : 'SRI KONDAMMAL / ENDAMMAL TEMPLES'
+                  }}
+                </div>
+                <div class="temple-address">
+                  {{
+                    receiptViewLang() === 'ta'
+                      ? 'கள்ளப்பாளையம் அஞ்சல், செட்டிபாளையம் வழி, கோயமுத்தூர் - 641 201.'
+                      : 'Kallapalayam Post, Chettipalayam Via, Coimbatore - 641 201.'
+                  }}
+                </div>
+              </div>
+              <!-- Right spacer to keep temple titles optically centered -->
+              <div class="temple-emblem-spacer" aria-hidden="true"></div>
+            </div>
+
+            <!-- Center Box: ரசீது -->
+            <div class="receipt-type-center-box">
+              <div class="receipt-banner-box">
+                {{ receiptViewLang() === 'ta' ? 'ரசீது' : 'RECEIPT' }}
+              </div>
+            </div>
+
+            <!-- Number & Date Row -->
+            <div class="receipt-meta-row">
+              <div class="receipt-meta-no">
+                <span class="meta-label">{{
+                  receiptViewLang() === 'ta' ? 'எண் :' : 'Receipt No :'
+                }}</span>
+                <span class="meta-val highlight-no">{{
+                  receiptView()!.receipt_number || '#' + receiptView()!.receipt_no
+                }}</span>
+              </div>
+              <div class="receipt-meta-date">
+                <span class="meta-label">{{
+                  receiptViewLang() === 'ta' ? 'தேதி :' : 'Date :'
+                }}</span>
+                <span class="meta-val">{{
+                  formatDate(receiptView()!.date || receiptView()!.createdAt)
+                }}</span>
+              </div>
+            </div>
+
+            <!-- Line 1: உயர்திரு -->
+            <div class="receipt-line">
+              <span class="receipt-label-thiru">{{
+                receiptViewLang() === 'ta' ? 'உயர்திரு.' : 'Thiru / Mr. / Ms.'
+              }}</span>
+              <div class="receipt-dotted-underline">
+                <strong class="receipt-donor-val">{{
+                  receiptView()!.donor_name || receiptView()!.username
+                }}</strong>
+              </div>
+            </div>
+
+            <!-- Line 2: அவர்களிடமிருந்து ரூபாய் -->
+            <div class="receipt-line">
+              <span class="receipt-label">{{
+                receiptViewLang() === 'ta' ? 'அவர்களிடமிருந்து ரூபாய்' : 'Received from them Rupees'
+              }}</span>
+              <div class="receipt-dotted-underline">
+                <span class="words-text">{{
+                  getReceiptWords(receiptView(), receiptViewLang())
+                }}</span>
+              </div>
+            </div>
+
+            <!-- Line 3: முதலீட்டு நிதி (Corpus Fund) காக -->
+            <div class="receipt-line">
+              <span class="receipt-label">
+                {{
+                  receiptViewLang() === 'ta'
+                    ? 'முதலீட்டு நிதி (Corpus Fund) காக'
+                    : 'Towards Corpus Fund as'
+                }}
+              </span>
+              <div class="receipt-dotted-underline">
+                @if (receiptView()!.type === 'Cash') {
+                  <span>{{ receiptViewLang() === 'ta' ? 'ரொக்கம்' : 'Cash' }}</span>
+                }
+                @if (receiptView()!.type === 'UPI') {
+                  <span>UPI (Ref: {{ receiptView()!.upi_ref_no || '—' }})</span>
+                }
+                @if (receiptView()!.type === 'Cheque') {
+                  <span
+                    >{{ receiptViewLang() === 'ta' ? 'காசோலை எண் : ' : 'Cheque No : '
+                    }}{{ receiptView()!.cheque_no || '—' }}</span
+                  >
+                }
+              </div>
+            </div>
+
+            <!-- Line 4: வங்கி ... யாக பெறப்பட்டது -->
+            <div class="receipt-line">
+              <span class="receipt-label">{{ receiptViewLang() === 'ta' ? 'வங்கி' : 'Bank' }}</span>
+              <div class="receipt-dotted-underline">
+                <span>{{ receiptView()!.remarks || receiptView()!.bank_name || '—' }}</span>
+              </div>
+              <span class="receipt-label-end">{{
+                receiptViewLang() === 'ta' ? 'யாக பெறப்பட்டது.' : 'received.'
+              }}</span>
+            </div>
+
+            <!-- Line 5: செல்போன் எண் -->
+            <div class="receipt-line">
+              <span class="receipt-label">{{
+                receiptViewLang() === 'ta' ? 'செல்போன் எண் :' : 'Mobile No :'
+              }}</span>
+              <div class="receipt-dotted-underline">
+                <span>{{ receiptView()!.donor_mobile || '—' }}</span>
+              </div>
+            </div>
+
+            <!-- Bottom Row: Amount Box + Signatures -->
+            <div class="receipt-bottom-row">
+              <div class="receipt-amount-box print-amount-box">
+                <span class="currency-symbol">{{ receiptViewLang() === 'ta' ? 'ரூ.' : '₹' }}</span>
+                <span class="printed-amount-val"
+                  >{{ (receiptView()!.amount || 0).toLocaleString('en-IN') }}/-</span
+                >
+              </div>
+
+              <div class="receipt-signatures">
+                <div class="sig-col sig-donor">
+                  <div class="sig-line"></div>
+                  <span class="sig-caption">
+                    {{
+                      receiptViewLang() === 'ta'
+                        ? 'நன்கொடை செலுத்துபவர் கையெழுத்து'
+                        : "Donor's Signature"
+                    }}
+                  </span>
+                </div>
+                <div class="sig-col sig-collector">
+                  <div class="sig-line"></div>
+                  <span class="sig-caption">
+                    {{ receiptViewLang() === 'ta' ? 'வசூலிப்பவர்' : "Collector's Signature" }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       DELETE CONFIRM MODAL
   ═══════════════════════════════════════════════════════════════ -->
   @if (isDeleteConfirmOpen()) {
-  <div class="modal-overlay" (click)="cancelDelete()">
-    <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3 class="modal-title">{{ 'CONFIRM_DELETE_TITLE' | translate }}</h3>
-        <button class="icon-btn close-modal" (click)="cancelDelete()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>{{ 'CONFIRM_DELETE_MSG' | translate }}</p>
-        <p class="delete-user-target">
-          <strong>{{ donationToDelete()?.username }}</strong> —
-          {{ formatAmount(donationToDelete()?.amount || 0) }}
-          ({{ donationToDelete()?.type }})
-        </p>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" (click)="cancelDelete()">{{ 'CANCEL' | translate }}</button>
-        <button type="button" class="btn btn-danger" (click)="executeDelete()" [disabled]="isLoading()">
-          {{ 'DELETE' | translate }}
-        </button>
+    <div class="modal-overlay" (click)="cancelDelete()">
+      <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3 class="modal-title">{{ 'CONFIRM_DELETE_TITLE' | translate }}</h3>
+          <button class="icon-btn close-modal" (click)="cancelDelete()">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>{{ 'CONFIRM_DELETE_MSG' | translate }}</p>
+          <p class="delete-user-target">
+            <strong>{{ donationToDelete()?.donor_name || donationToDelete()?.username }}</strong> —
+            {{ formatAmount(donationToDelete()?.amount || 0) }}
+            ({{ donationToDelete()?.receipt_number || donationToDelete()?.type }})
+          </p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelDelete()">
+            {{ 'CANCEL' | translate }}
+          </button>
+          <button
+            type="submit"
+            class="btn btn-danger"
+            (click)="executeDelete()"
+            [disabled]="isLoading()"
+          >
+            {{ 'DELETE' | translate }}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
   }
-
 </div>

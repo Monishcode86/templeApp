@@ -501,7 +501,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
     // Set initial input mode: Tamil if current UI language is Tamil, otherwise English
     const defaultMode: InputMode =
-      this.translationService.currentLanguage() === 'ta' ? 'tamil' : 'english';
+      this.translationService.currentLanguage() === 'ta' ? 'tanglish' : 'english';
     this.onInputModeChange(defaultMode);
   }
 
@@ -543,7 +543,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
     // Set initial input mode: Tamil if current UI language is Tamil, otherwise English
     const defaultMode: InputMode =
-      this.translationService.currentLanguage() === 'ta' ? 'tamil' : 'english';
+      this.translationService.currentLanguage() === 'ta' ? 'tanglish' : 'english';
     this.onInputModeChange(defaultMode);
   }
 
