@@ -38,6 +38,85 @@ const deleteLocalImageFile = (imageUrl) => {
 };
 
 /**
+ * Validate that all provided emails are unique:
+ * 1. Internally: No two entities (main user or family members) in the same submission share an email.
+ * 2. Globally: None of the emails match ANY existing user's email or ANY family member's email in MongoDB.
+ * 
+ * @param {string|null} mainEmail - Clean lowercase main user email (or null)
+ * @param {Array} familyList - Clean array of family member objects [{ username, email, ... }]
+ * @param {string|null} excludeUserId - Document _id to exclude (during update)
+ */
+const validateEmailUniqueness = async (mainEmail, familyList = [], excludeUserId = null) => {
+    const emailsWithSources = [];
+
+    if (mainEmail && typeof mainEmail === 'string' && mainEmail.trim()) {
+        emailsWithSources.push({
+            email: mainEmail.toLowerCase().trim(),
+            source: 'Main user'
+        });
+    }
+
+    if (Array.isArray(familyList)) {
+        familyList.forEach((m, idx) => {
+            if (m && m.email && typeof m.email === 'string' && m.email.trim()) {
+                emailsWithSources.push({
+                    email: m.email.toLowerCase().trim(),
+                    source: `Family member #${idx + 1} (${m.username || 'unnamed'})`
+                });
+            }
+        });
+    }
+
+    if (emailsWithSources.length === 0) return;
+
+    // 1. Check internal duplicates within this form submission
+    const seen = new Map();
+    for (const item of emailsWithSources) {
+        if (seen.has(item.email)) {
+            const firstSource = seen.get(item.email);
+            const error = new Error(
+                `Email '${item.email}' is used more than once in this form (${firstSource} and ${item.source}). Email must be unique.`
+            );
+            error.statusCode = 409;
+            throw error;
+        }
+        seen.set(item.email, item.source);
+    }
+
+    // 2. Check each email against MongoDB (both main user email and family_data.email)
+    const emailList = Array.from(seen.keys());
+    for (const email of emailList) {
+        const query = {
+            $or: [
+                { email: email },
+                { 'family_data.email': email }
+            ]
+        };
+
+        if (excludeUserId) {
+            query._id = { $ne: excludeUserId };
+        }
+
+        const conflict = await commonDao.findOneData({ query }, SCHEMA_NAME);
+        if (conflict) {
+            const isMain = conflict.email === email;
+            let detail = '';
+            if (isMain) {
+                detail = `user '${conflict.username}'`;
+            } else {
+                const matchedMember = (conflict.family_data || []).find(
+                    f => f && f.email && f.email.toLowerCase().trim() === email
+                );
+                detail = `family member '${matchedMember?.username || 'member'}' of user '${conflict.username}'`;
+            }
+            const error = new Error(`Email '${email}' is already in use by ${detail}. Email must be unique.`);
+            error.statusCode = 409;
+            throw error;
+        }
+    }
+};
+
+/**
  * Add a new user (Only ADMIN)
  */
 const adduser = async (userData, currentUser) => {
@@ -56,10 +135,17 @@ const adduser = async (userData, currentUser) => {
         employee_id,
         image,
         address,
+        address_line1,
+        address_line2,
+        nation,
+        state,
+        city,
+        pincode,
         country_code,
         mobile_number,
         alt_country_code,
-        alt_mobile_number
+        alt_mobile_number,
+        family_data
     } = userData;
 
     if (!username || !username.trim()) {
@@ -68,13 +154,54 @@ const adduser = async (userData, currentUser) => {
         throw error;
     }
 
-    if (!address || !address.trim()) {
-        const error = new Error('Address is required.');
+    const cleanLine1 = (address_line1 || '').trim();
+    const cleanLine2 = (address_line2 || '').trim();
+    const cleanNation = (nation || '').trim();
+    const cleanState = (state || '').trim();
+    const cleanCity = (city || '').trim();
+    const cleanPincode = (pincode || '').trim();
+    const rawAddress = (address || '').trim();
+
+    if (!cleanLine1 && !rawAddress) {
+        const error = new Error('Address Line 1 is required.');
+        error.statusCode = 400;
+        throw error;
+    }
+    if (cleanLine1 && !cleanNation && !rawAddress) {
+        const error = new Error('Nation is required.');
+        error.statusCode = 400;
+        throw error;
+    }
+    if (cleanLine1 && !cleanState && !rawAddress) {
+        const error = new Error('State is required.');
+        error.statusCode = 400;
+        throw error;
+    }
+    if (cleanLine1 && !cleanCity && !rawAddress) {
+        const error = new Error('City is required.');
+        error.statusCode = 400;
+        throw error;
+    }
+    if (cleanLine1 && !cleanPincode && !rawAddress) {
+        const error = new Error('Pincode is required.');
         error.statusCode = 400;
         throw error;
     }
 
-    // Email is optional. If provided, check valid format and uniqueness
+    // Format composite full address
+    let fullAddress = rawAddress;
+    if (cleanLine1) {
+        const parts = [cleanLine1];
+        if (cleanLine2) parts.push(cleanLine2);
+        if (cleanCity) parts.push(cleanCity);
+        if (cleanState && cleanPincode) parts.push(`${cleanState} - ${cleanPincode}`);
+        else if (cleanState) parts.push(cleanState);
+        else if (cleanPincode) parts.push(cleanPincode);
+        if (cleanNation) parts.push(cleanNation);
+        fullAddress = parts.join(', ');
+    }
+
+    // Email is optional. If provided, check valid format
     let cleanEmail = null;
     if (email && typeof email === 'string' && email.trim()) {
         cleanEmail = email.toLowerCase().trim();
@@ -82,12 +209,6 @@ const adduser = async (userData, currentUser) => {
         if (!emailRegex.test(cleanEmail)) {
             const error = new Error('Please provide a valid email address.');
             error.statusCode = 400;
-            throw error;
-        }
-        const existingEmail = await commonDao.findOneData({ query: { email: cleanEmail } }, SCHEMA_NAME);
-        if (existingEmail) {
-            const error = new Error(`User with email '${cleanEmail}' already exists.`);
-            error.statusCode = 409;
             throw error;
         }
     }
@@ -140,12 +261,63 @@ const adduser = async (userData, currentUser) => {
         role: role || 'USER',
         user_id: assignedUserId,
         image: image ? image.trim() : null,
-        address: address.trim(),
+        address: fullAddress || null,
+        address_line1: cleanLine1 || null,
+        address_line2: cleanLine2 || null,
+        nation: cleanNation || null,
+        state: cleanState || null,
+        city: cleanCity || null,
+        pincode: cleanPincode || null,
         country_code: country_code ? country_code.trim() : '+91',
         mobile_number: mobile_number && mobile_number.trim() ? mobile_number.trim() : null,
         alt_country_code: alt_country_code ? alt_country_code.trim() : '+91',
         alt_mobile_number: alt_mobile_number && alt_mobile_number.trim() ? alt_mobile_number.trim() : null
     };
+
+    // Clean and validate optional family_data
+    const rawFamily = family_data !== undefined ? family_data : [];
+    let cleanFamily = [];
+    if (Array.isArray(rawFamily)) {
+        for (let i = 0; i < rawFamily.length; i++) {
+            const member = rawFamily[i];
+            if (!member) continue;
+            const mUsername = (member.username || '').trim();
+            const mRelation = (member.relation_type || '').trim().toLowerCase();
+            if (!mUsername && !mRelation && !member.email && !member.mobile_number) continue;
+            if (!mUsername) {
+                const error = new Error(`Family member #${i + 1}: Username is required.`);
+                error.statusCode = 400;
+                throw error;
+            }
+            if (!mRelation) {
+                const error = new Error(`Family member #${i + 1}: Relation type is required.`);
+                error.statusCode = 400;
+                throw error;
+            }
+            let mEmail = null;
+            if (member.email && typeof member.email === 'string' && member.email.trim()) {
+                mEmail = member.email.toLowerCase().trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(mEmail)) {
+                    const error = new Error(`Family member #${i + 1}: Please provide a valid email address.`);
+                    error.statusCode = 400;
+                    throw error;
+                }
+            }
+            cleanFamily.push({
+                username: mUsername,
+                email: mEmail,
+                country_code: member.country_code ? member.country_code.trim() : '+91',
+                mobile_number: member.mobile_number && member.mobile_number.trim() ? member.mobile_number.trim() : null,
+                relation_type: mRelation
+            });
+        }
+    }
+
+    // Comprehensive Email Uniqueness Check (Form-internal and Database-wide)
+    await validateEmailUniqueness(cleanEmail, cleanFamily, null);
+
+    newUserPayload.family_data = cleanFamily;
 
     const createdUser = await commonDao.insertOne(newUserPayload, SCHEMA_NAME);
     logger.info(`New user created: ${createdUser.username} (ID: ${createdUser._id}, UserID: ${createdUser.user_id})`);
@@ -181,7 +353,15 @@ const getalluser = async (params = {}, requestingUser) => {
                 { user_id: searchRegex },
                 { employee_id: searchRegex },
                 { address: searchRegex },
-                { mobile_number: searchRegex }
+                { address_line1: searchRegex },
+                { address_line2: searchRegex },
+                { nation: searchRegex },
+                { state: searchRegex },
+                { city: searchRegex },
+                { pincode: searchRegex },
+                { mobile_number: searchRegex },
+                { 'family_data.username': searchRegex },
+                { 'family_data.mobile_number': searchRegex }
             ]
         });
     }
@@ -237,14 +417,50 @@ const updateuser = async (updateData, id) => {
 
     const payload = { ...updateData };
 
-    // Address is required if provided
-    if (payload.address !== undefined) {
-        if (!payload.address || !payload.address.trim()) {
-            const error = new Error('Address is required.');
+    // Structured address handling
+    const isAddressFieldProvided =
+        payload.address_line1 !== undefined ||
+        payload.address_line2 !== undefined ||
+        payload.nation !== undefined ||
+        payload.state !== undefined ||
+        payload.city !== undefined ||
+        payload.pincode !== undefined ||
+        payload.address !== undefined;
+
+    if (isAddressFieldProvided) {
+        const line1 = payload.address_line1 !== undefined ? (payload.address_line1 || '').trim() : (user.address_line1 || '').trim();
+        const line2 = payload.address_line2 !== undefined ? (payload.address_line2 || '').trim() : (user.address_line2 || '').trim();
+        const cleanNation = payload.nation !== undefined ? (payload.nation || '').trim() : (user.nation || '').trim();
+        const cleanState = payload.state !== undefined ? (payload.state || '').trim() : (user.state || '').trim();
+        const cleanCity = payload.city !== undefined ? (payload.city || '').trim() : (user.city || '').trim();
+        const cleanPincode = payload.pincode !== undefined ? (payload.pincode || '').trim() : (user.pincode || '').trim();
+        const rawAddress = payload.address !== undefined ? (payload.address || '').trim() : (user.address || '').trim();
+
+        if (payload.address_line1 !== undefined && !line1 && !rawAddress) {
+            const error = new Error('Address Line 1 is required.');
             error.statusCode = 400;
             throw error;
         }
-        payload.address = payload.address.trim();
+
+        let fullAddress = rawAddress;
+        if (line1) {
+            const parts = [line1];
+            if (line2) parts.push(line2);
+            if (cleanCity) parts.push(cleanCity);
+            if (cleanState && cleanPincode) parts.push(`${cleanState} - ${cleanPincode}`);
+            else if (cleanState) parts.push(cleanState);
+            else if (cleanPincode) parts.push(cleanPincode);
+            if (cleanNation) parts.push(cleanNation);
+            fullAddress = parts.join(', ');
+        }
+
+        if (payload.address_line1 !== undefined) payload.address_line1 = line1 || null;
+        if (payload.address_line2 !== undefined) payload.address_line2 = line2 || null;
+        if (payload.nation !== undefined) payload.nation = cleanNation || null;
+        if (payload.state !== undefined) payload.state = cleanState || null;
+        if (payload.city !== undefined) payload.city = cleanCity || null;
+        if (payload.pincode !== undefined) payload.pincode = cleanPincode || null;
+        payload.address = fullAddress || null;
     }
 
     // Check user_id uniqueness if updated
@@ -267,25 +483,14 @@ const updateuser = async (updateData, id) => {
         }
     }
 
-    // Check email uniqueness and format if updated
+    // Check email format if updated
     if (payload.email !== undefined) {
-        if (payload.email && payload.email.trim()) {
+        if (payload.email && typeof payload.email === 'string' && payload.email.trim()) {
             payload.email = payload.email.toLowerCase().trim();
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(payload.email)) {
                 const error = new Error('Please provide a valid email address.');
                 error.statusCode = 400;
-                throw error;
-            }
-            const existingEmail = await commonDao.findOneData(
-                {
-                    query: { email: payload.email, _id: { $ne: id } }
-                },
-                SCHEMA_NAME
-            );
-            if (existingEmail) {
-                const error = new Error(`User with email '${payload.email}' already exists.`);
-                error.statusCode = 409;
                 throw error;
             }
         } else {
@@ -302,6 +507,54 @@ const updateuser = async (updateData, id) => {
     if (payload.password) {
         payload.password = await bcrypt.hash(payload.password, saltRounds);
     }
+
+    // Clean and validate optional family_data
+    const rawFamily = payload.family_data !== undefined ? payload.family_data : undefined;
+    if (rawFamily !== undefined) {
+        let cleanFamily = [];
+        if (Array.isArray(rawFamily)) {
+            for (let i = 0; i < rawFamily.length; i++) {
+                const member = rawFamily[i];
+                if (!member) continue;
+                const mUsername = (member.username || '').trim();
+                const mRelation = (member.relation_type || '').trim().toLowerCase();
+                if (!mUsername && !mRelation && !member.email && !member.mobile_number) continue;
+                if (!mUsername) {
+                    const error = new Error(`Family member #${i + 1}: Username is required.`);
+                    error.statusCode = 400;
+                    throw error;
+                }
+                if (!mRelation) {
+                    const error = new Error(`Family member #${i + 1}: Relation type is required.`);
+                    error.statusCode = 400;
+                    throw error;
+                }
+                let mEmail = null;
+                if (member.email && typeof member.email === 'string' && member.email.trim()) {
+                    mEmail = member.email.toLowerCase().trim();
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(mEmail)) {
+                        const error = new Error(`Family member #${i + 1}: Please provide a valid email address.`);
+                        error.statusCode = 400;
+                        throw error;
+                    }
+                }
+                cleanFamily.push({
+                    username: mUsername,
+                    email: mEmail,
+                    country_code: member.country_code ? member.country_code.trim() : '+91',
+                    mobile_number: member.mobile_number && member.mobile_number.trim() ? member.mobile_number.trim() : null,
+                    relation_type: mRelation
+                });
+            }
+        }
+        payload.family_data = cleanFamily;
+    }
+
+    // Comprehensive Email Uniqueness Check (Form-internal and Database-wide excluding current user ID)
+    const effectiveMainEmail = payload.email !== undefined ? payload.email : user.email;
+    const effectiveFamily = payload.family_data !== undefined ? payload.family_data : (user.family_data || []);
+    await validateEmailUniqueness(effectiveMainEmail, effectiveFamily, id);
 
     // Remove legacy plant fields if present
     delete payload.plant_id;

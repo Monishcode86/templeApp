@@ -1,3 +1,13 @@
+export interface FamilyMember {
+  _id?: string;
+  id?: string;
+  username: string;
+  email?: string | null;
+  country_code?: string;
+  mobile_number?: string | null;
+  relation_type: string;
+}
+
 export interface User {
   _id?: string;
   id?: string;
@@ -8,10 +18,17 @@ export interface User {
   employee_id?: string | null;
   image?: string | null;
   address?: string;
+  address_line1?: string;
+  address_line2?: string;
+  nation?: string;
+  state?: string;
+  city?: string;
+  pincode?: string;
   country_code?: string;
   mobile_number?: string | null;
   alt_country_code?: string;
   alt_mobile_number?: string | null;
+  family_data?: FamilyMember[];
   plant_id?: string | null;
   plant_name?: string | null;
   createdAt?: any;

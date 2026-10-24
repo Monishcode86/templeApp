@@ -1,0 +1,135 @@
+@if (tamilService.isKeypadVisible()) {
+<div class="tamil-keypad-container" (click)="$event.stopPropagation()">
+  <!-- Windows Touch Keyboard Style Header Bar -->
+  <div class="keypad-header">
+    <div class="keypad-title-group">
+      <!-- Windows Keyboard Icon -->
+      <svg class="win-logo-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="4" width="20" height="16" rx="3"></rect>
+        <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10"></path>
+      </svg>
+      <span class="keypad-title">Windows தமிழ் விசைப்பலகை (Tamil Keypad)</span>
+    </div>
+
+    <div class="keypad-header-actions">
+      <!-- Tanglish Transliteration Toggle Button -->
+      <button 
+        type="button" 
+        class="tanglish-toggle-btn" 
+        [class.active]="tamilService.isTanglishEnabled()"
+        (click)="toggleTanglish()"
+        [title]="tamilService.isTanglishEnabled() ? 'Tanglish typing ON: Type English words and press Space to convert' : 'Tanglish typing OFF'">
+        <span class="toggle-indicator"></span>
+        <span class="toggle-text">Tanglish ⇄ தமிழ் {{ tamilService.isTanglishEnabled() ? 'ON' : 'OFF' }}</span>
+      </button>
+
+      <!-- Close / Hide Keypad Button -->
+      <button type="button" class="keypad-close-btn" (click)="onClose()" title="Close Keypad">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Keypad Tab Selector -->
+  <div class="keypad-tabs">
+    <button type="button" class="tab-btn" [class.active]="activeTab() === 'all'" (click)="activeTab.set('all')">
+      முழு விசைப்பலகை (All)
+    </button>
+    <button type="button" class="tab-btn" [class.active]="activeTab() === 'vowels'" (click)="activeTab.set('vowels')">
+      உயிர் & குறிகள் (Vowels)
+    </button>
+    <button type="button" class="tab-btn" [class.active]="activeTab() === 'consonants'" (click)="activeTab.set('consonants')">
+      மெய் & கிரந்தம் (Consonants)
+    </button>
+    <button type="button" class="tab-btn" [class.active]="activeTab() === 'numbers'" (click)="activeTab.set('numbers')">
+      எண்கள் (Numbers)
+    </button>
+  </div>
+
+  <!-- Keypad Keys Body -->
+  <div class="keypad-body">
+    <!-- Row: Numbers (Visible in all or numbers tab) -->
+    @if (activeTab() === 'all' || activeTab() === 'numbers') {
+      <div class="keys-row numbers-row">
+        @for (num of numbers; track num) {
+          <button type="button" class="key-btn num-key" (click)="onKeyPress(num)">{{ num }}</button>
+        }
+        @for (sym of symbols; track sym) {
+          <button type="button" class="key-btn sym-key" (click)="onKeyPress(sym)">{{ sym }}</button>
+        }
+      </div>
+    }
+
+    <!-- Row 1: Vowels (உயிர் எழுத்துக்கள்) -->
+    @if (activeTab() === 'all' || activeTab() === 'vowels') {
+      <div class="keys-section-label">உயிரெழுத்துக்கள்:</div>
+      <div class="keys-row vowels-row">
+        @for (v of vowels; track v) {
+          <button type="button" class="key-btn vowel-key" (click)="onKeyPress(v)">{{ v }}</button>
+        }
+      </div>
+
+      <!-- Row 2: Vowel Signs / Maatras (துணைக்குறிகள்) -->
+      <div class="keys-section-label">துணைக்குறிகள் (Combine with consonants):</div>
+      <div class="keys-row signs-row">
+        @for (s of vowelSigns; track s) {
+          <button type="button" class="key-btn sign-key" (click)="onKeyPress(s)">{{ s }}</button>
+        }
+      </div>
+    }
+
+    <!-- Row 3 & 4: Consonants (மெய்யெழுத்துக்கள் & கிரந்தம்) -->
+    @if (activeTab() === 'all' || activeTab() === 'consonants') {
+      <div class="keys-section-label">மெய்யெழுத்துக்கள்:</div>
+      <div class="keys-row consonants-row">
+        @for (c of consonantsRow1; track c) {
+          <button type="button" class="key-btn consonant-key" (click)="onKeyPress(c)">{{ c }}</button>
+        }
+      </div>
+
+      <div class="keys-row consonants-row">
+        @for (c of consonantsRow2; track c) {
+          <button type="button" class="key-btn consonant-key" (click)="onKeyPress(c)">{{ c }}</button>
+        }
+        @for (g of grantha; track g) {
+          <button type="button" class="key-btn grantha-key" (click)="onKeyPress(g)">{{ g }}</button>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Bottom Function / Action Bar (Space, Backspace, Clear) -->
+  <div class="keypad-bottom-bar">
+    <button type="button" class="action-key-btn clear-key" (click)="onClear()" title="Clear all text in active input">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"></polyline>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      </svg>
+      <span>அழி (Clear)</span>
+    </button>
+
+    <button type="button" class="action-key-btn space-key" (click)="onSpace()" title="Insert Space">
+      <span>இடைவெளி (Space)</span>
+    </button>
+
+    <button type="button" class="action-key-btn backspace-key" (click)="onBackspace()" title="Backspace">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+        <line x1="18" y1="9" x2="12" y2="15"></line>
+        <line x1="12" y1="9" x2="18" y2="15"></line>
+      </svg>
+      <span>⌫</span>
+    </button>
+
+    <button type="button" class="action-key-btn done-key" (click)="onClose()" title="Done / Hide">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span>முடிந்தது</span>
+    </button>
+  </div>
+</div>
+}

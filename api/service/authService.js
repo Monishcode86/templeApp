@@ -84,10 +84,17 @@ const login = async (credentials = {}) => {
             employee_id: user.user_id || user.employee_id || null,
             image: user.image || null,
             address: user.address || null,
+            address_line1: user.address_line1 || null,
+            address_line2: user.address_line2 || null,
+            nation: user.nation || null,
+            state: user.state || null,
+            city: user.city || null,
+            pincode: user.pincode || null,
             country_code: user.country_code || '+91',
             mobile_number: user.mobile_number || null,
             alt_country_code: user.alt_country_code || '+91',
-            alt_mobile_number: user.alt_mobile_number || null
+            alt_mobile_number: user.alt_mobile_number || null,
+            family_data: user.family_data || []
         }
     };
 };
@@ -162,10 +169,17 @@ const refreshAccessToken = async (incomingRefreshToken) => {
             employee_id: user.user_id || user.employee_id || null,
             image: user.image || null,
             address: user.address || null,
+            address_line1: user.address_line1 || null,
+            address_line2: user.address_line2 || null,
+            nation: user.nation || null,
+            state: user.state || null,
+            city: user.city || null,
+            pincode: user.pincode || null,
             country_code: user.country_code || '+91',
             mobile_number: user.mobile_number || null,
             alt_country_code: user.alt_country_code || '+91',
-            alt_mobile_number: user.alt_mobile_number || null
+            alt_mobile_number: user.alt_mobile_number || null,
+            family_data: user.family_data || []
         }
     };
 };

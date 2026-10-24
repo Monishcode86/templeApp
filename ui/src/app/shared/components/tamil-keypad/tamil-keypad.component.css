@@ -1,0 +1,320 @@
+/* ==========================================================================
+   WINDOWS-STYLE VIRTUAL TAMIL KEYPAD (TOUCH KEYBOARD)
+   ========================================================================== */
+
+.tamil-keypad-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99999;
+  background: var(--bg-card, #1e293b);
+  border-top: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(16px);
+  padding: 0.65rem 1.25rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+  border-radius: 18px 18px 0 0;
+  animation: slideUpKeypad 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+@keyframes slideUpKeypad {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Header Bar */
+.keypad-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+}
+
+.keypad-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-main, #f1f5f9);
+}
+
+.win-logo-icon {
+  color: var(--color-primary, #6366f1);
+}
+
+.keypad-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.keypad-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+/* Tanglish Toggle Button */
+.tanglish-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.775rem;
+  font-weight: 600;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+  background: var(--bg-hover, rgba(255, 255, 255, 0.05));
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tanglish-toggle-btn.active {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.toggle-indicator {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.keypad-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.keypad-close-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* Keypad Tabs */
+.keypad-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding-bottom: 0.2rem;
+}
+
+.tab-btn {
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  background: var(--bg-hover, rgba(255, 255, 255, 0.04));
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--text-main, #f1f5f9);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.tab-btn.active {
+  background: var(--color-primary, #6366f1);
+  color: #ffffff;
+}
+
+/* Keypad Body */
+.keypad-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+
+.keys-section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  margin-top: 0.2rem;
+  margin-bottom: -0.15rem;
+}
+
+.keys-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+/* Individual Key Buttons */
+.key-btn {
+  min-width: 38px;
+  height: 38px;
+  flex: 1 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: var(--bg-input, rgba(255, 255, 255, 0.06));
+  color: var(--text-main, #f8fafc);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  transition: all 0.12s ease;
+}
+
+.key-btn:hover {
+  background: var(--color-primary, #6366f1);
+  color: #ffffff;
+  border-color: var(--color-primary, #6366f1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+}
+
+.key-btn:active {
+  transform: translateY(1px) scale(0.96);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Specific Key Types */
+.sign-key {
+  background: rgba(99, 102, 241, 0.08);
+  color: #818cf8;
+  font-weight: 700;
+}
+
+.vowel-key {
+  font-weight: 700;
+}
+
+.grantha-key {
+  color: #38bdf8;
+}
+
+.num-key, .sym-key {
+  font-size: 0.9rem;
+}
+
+/* Bottom Action Bar */
+.keypad-bottom-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.25rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+}
+
+.action-key-btn {
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0 0.85rem;
+  border-radius: 8px;
+  font-size: 0.825rem;
+  font-weight: 600;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: var(--bg-hover, rgba(255, 255, 255, 0.07));
+  color: var(--text-main, #f8fafc);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.action-key-btn:hover {
+  background: var(--color-primary, #6366f1);
+  color: #ffffff;
+  border-color: var(--color-primary, #6366f1);
+}
+
+.space-key {
+  flex: 1;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: var(--bg-input, rgba(255, 255, 255, 0.05));
+}
+
+.backspace-key {
+  min-width: 65px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.backspace-key:hover {
+  background: #f59e0b;
+  color: #ffffff;
+}
+
+.clear-key {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.clear-key:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.done-key {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.done-key:hover {
+  background: #10b981;
+  color: #ffffff;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .tamil-keypad-container {
+    padding: 0.5rem 0.65rem 0.75rem;
+  }
+
+  .key-btn {
+    min-width: 32px;
+    height: 34px;
+    font-size: 0.9rem;
+    padding: 0 0.3rem;
+  }
+
+  .keypad-title {
+    font-size: 0.75rem;
+  }
+
+  .tanglish-toggle-btn {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.45rem;
+  }
+}

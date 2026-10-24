@@ -427,13 +427,7 @@
         <div class="dropdown-wrapper">
           <button class="lang-btn" (click)="toggleLanguageDropdown()" aria-label="Select Language">
             <span class="lang-flag">{{
-              translationService.currentLanguage() === 'ta'
-                ? '🇮🇳'
-                : translationService.currentLanguage() === 'es'
-                  ? '🇪🇸'
-                  : translationService.currentLanguage() === 'fr'
-                    ? '🇫🇷'
-                    : '🇺🇸'
+              translationService.currentLanguage() === 'ta' ? '🇮🇳' : '🇺🇸'
             }}</span>
             <span class="lang-code">{{ translationService.currentLanguage().toUpperCase() }}</span>
             <svg
