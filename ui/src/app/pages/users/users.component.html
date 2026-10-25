@@ -141,6 +141,8 @@
                         [src]="getImageUrl(user.image)"
                         [alt]="user.username"
                         class="avatar-mini avatar-img"
+                        loading="lazy"
+                        (error)="user.image = null"
                       />
                     } @else {
                       <span class="avatar-mini">{{

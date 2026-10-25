@@ -17,7 +17,7 @@ app.use(helmet({
 }));
 
 // Serve static uploaded files under /uploads
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // CORS configuration (supports onprem intranet or cloud domains)
 const corsOptions = {

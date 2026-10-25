@@ -8,47 +8,43 @@ This document describes the automated deployment architecture, data protection r
 
 Every path, service name, and configuration parameter has been confirmed on the target host:
 
-| Component | Path / Value | Verification Notes |
+| Component | Dynamic Resolution / Default | Verification Notes |
 | :--- | :--- | :--- |
-| **Workspace Root** | `D:\study\templeApp` | Contains `ui/`, `api/`, `deploy.bat`, and `DEPLOYMENT.md` |
-| **Dedicated Staging Directory** | `D:\study\templeApp\staging` | Generated temporary build area (`staging\ui` and `staging\api`) |
-| **Angular UI Source** | `D:\study\templeApp\ui` | Angular 22 project (`@angular/build:application`) |
-| **Staging UI Output** | `D:\study\templeApp\staging\ui\browser` | Contains production `index.html` and bundled assets |
-| **Node.js Active Runtime** | `v24.21.0` (x64) | Active Node binary in `PATH` (`C:\Program Files\nodejs\node.exe`) |
-| **Node.js API Source** | `D:\study\templeApp\api` | Express 5 application (`index.js`) |
-| **API Executable Technology** | Node.js 24 Single Executable Application (SEA) | Executable (`myNode.exe`) fused with bootstrap blob via `postject` |
-| **NSSM Executable** | `D:\Softwares\nssm-2.24\nssm-2.24\win64\nssm.exe` | Verified exact binary path |
-| **API NSSM Service** | `MYNODE-2` | Registered Windows service (auto-created and configured if not present) |
-| **API Target Executable** | `D:\study\New folder\myNode.exe` | Binary path configured in NSSM |
-| **API Service Directory** | `D:\study\New folder` | Working directory configured in NSSM (quotes handle spaces) |
-| **Nginx Installation** | `D:\Softwares\nginx` | `D:\Softwares\nginx\nginx.exe` |
-| **Nginx Configuration** | `D:\Softwares\nginx\conf\nginx.conf` | Reverse proxies `/api/` and `/health` to `http://127.0.0.1:5000` |
-| **Nginx Document Root** | `D:/study/templeApp/ui/dist/ui/browser` | Configured directly in `nginx.conf` |
-| **Deployment Backups** | `D:\study\templeApp\backups\` | Timestamped UI and API rollbacks (never auto-deleted) |
+| **Workspace Root** | `%ROOT_DIR%` (`%~dp0`) | Automatically detected from script location on any drive/PC |
+| **Dedicated Staging Directory** | `%ROOT_DIR%\staging` | Temporary build area (`staging\ui` and `staging\api`) |
+| **Angular UI Source** | `%ROOT_DIR%\ui` | Angular 22 project (`@angular/build:application`) |
+| **Staging UI Output** | `%ROOT_DIR%\staging\ui\browser` | Production `index.html` and bundled assets |
+| **Node.js Active Runtime** | `node.exe` in system `PATH` | Verified Node 24 binary |
+| **Node.js API Source** | `%ROOT_DIR%\api` | Express 5 application (`index.js`) |
+| **API Executable Technology** | Node.js 24 Single Executable Application (SEA) | Standalone `myNode.exe` with bundled code and embedded secrets |
+| **NSSM Executable** | Dynamic Auto-Detection | Checks `where nssm`, `%ROOT_DIR%\..\Softwares`, `C:\nssm`, `D:\Softwares`, etc. |
+| **API NSSM Service** | `MYNODE-2` (configurable via `API_SERVICE_NAME`) | Registered Windows service (auto-created if not present) |
+| **API Target Executable** | `%ROOT_DIR%\deployment\myNode.exe` | Binary path configured in NSSM |
+| **API Service Directory** | `%ROOT_DIR%\deployment` | Working directory in NSSM (stores only `myNode.exe` and `logs/`) |
+| **Nginx Installation** | Dynamic Auto-Detection | Checks `where nginx`, `C:\nginx`, `D:\Softwares\nginx`, etc. |
+| **Nginx Configuration** | `%NGINX_DIR%\conf\nginx.conf` | Reverse proxies `/api/` and `/health` to `http://127.0.0.1:5000` |
+| **Nginx Document Root** | `%ROOT_DIR%\ui\dist\ui\browser` | Dynamically points to the current workspace UI build |
+| **Deployment Backups** | `%ROOT_DIR%\backups\` | Timestamped UI and API rollbacks (never auto-deleted) |
 
 ---
 
-## 2. API Packaging Architecture: Node 24 SEA with Staged Runtime
+## 2. API Packaging Architecture: Self-Contained Node 24 SEA
 
 ### Architecture & Runtime Model
-`myNode.exe` is **not a monolithic self-contained virtual bundle**. On Windows, this backend requires physical disk paths for:
-- **Native C++ Addons (`bcrypt`)**: The Windows dynamic link loader (`LoadLibraryExW`) requires physical `.node` binaries (`node.napi.node`) on an NTFS filesystem. Addons cannot be executed from inside virtual snapshots (such as `@yao-pkg/pkg`'s `C:\snapshot`).
-- **Persistent Disk Logging (`winston-daily-rotate-file`)**: Daily log rotation creates and appends physical files in the `logs/` directory.
-- **Persistent Uploads (`multer`)**: Static file delivery serves attachments from `uploads/`.
+`myNode.exe` is compiled as a **genuinely self-contained Node.js 24 Single Executable Application (SEA)**:
+- **No `node_modules` in Deployment Directory**: The deployment directory (`D:\study\templeApp\deployment`) exclusively stores `myNode.exe` and the `logs/` directory.
+- **Embedded Application Code**: All Express routes, middleware, controllers, Mongoose models, and pure JavaScript dependencies are bundled into `sea-entry.js` with `esbuild`.
+- **Embedded Native C++ Addon Loader (`bcrypt`)**: The prebuilt 64-bit Windows binary (`bcrypt.node`) is embedded as base64 in a loader shim. On application startup, if not already present in `%TEMP%`, it writes `templeapp_bcrypt_v6.node` to the OS temporary directory and loads it via `process.dlopen`. This provides 100% native C++ bcrypt cryptographic performance while keeping the deployment folder clean.
+- **Persistent Disk Logging (`winston-daily-rotate-file`)**: Winston outputs daily rotating logs (`app-*.log`, `error-*.log`) directly into `logs/` relative to `process.cwd()` (`D:\study\templeApp\deployment\logs`).
+- **NSSM Log Redirection**: NSSM routes `AppStdout` and `AppStderr` to `logs\service.log` and `logs\service.err.log`.
 
 ### How It Operates
-1. [deploy.bat](file:///d:/study/templeApp/deploy.bat) compiles a **Node.js 24 Single Executable Application (SEA)** using `--experimental-sea-config` and `postject`.
-2. The executable embeds a bootstrap script that dynamically anchors to the directory containing the binary:
-   ```javascript
-   const path = require('node:path');
-   const { createRequire } = require('node:module');
-   const appDir = path.dirname(process.execPath);
-   process.chdir(appDir);
-   const req = createRequire(path.join(appDir, 'package.json'));
-   req('./index.js');
-   ```
-3. In staging, `deploy.bat` stages `myNode.exe` together with the application runtime files (`package.json`, `index.js`, `server/`, `config/`, `node_modules` with native `bcrypt` prebuilds, and `.env`).
-4. This assembled bundle is verified during pre-flight before deployment to `D:\study\New folder\`.
+1. [deploy.bat](file:///d:/study/templeApp/deploy.bat) invokes `scripts\build_sea.js` in Step 2.
+2. `build_sea.js` bundles `api/index.js` using `esbuild` with the embedded `bcrypt` native loader shim into `staging\api\sea-entry.js`.
+3. Node.js compiles `sea-entry.js` into `staging\api\sea-prep.blob` via `--experimental-sea-config`.
+4. `postject` injects the SEA blob into `staging\api\myNode.exe`.
+5. Pre-flight verification validates `myNode.exe` in an isolated environment on ephemeral port `5998`.
+6. Step 6 deploys exclusively `myNode.exe` into `D:\study\templeApp\deployment`, creates `logs/`, updates NSSM parameters, and starts the service.
 
 ---
 
@@ -56,18 +52,16 @@ Every path, service name, and configuration parameter has been confirmed on the 
 
 To prevent data loss or accidental overwrites, [deploy.bat](file:///d:/study/templeApp/deploy.bat) enforces strict data isolation:
 
-1. **Production `.env` Protection**:
-   - If `D:\study\New folder\.env` exists, it is **preserved byte-for-byte** and never overwritten by the development `api\.env`.
-   - Robocopy explicitly excludes `/XF .env` when a production `.env` is detected.
-   - If no production `.env` exists (first-time deployment), the staged `.env` template is initialized with a prominent warning that credentials and secrets must be reviewed.
+1. **Zero Plaintext `.env` in Production Directory (Anti-Leak Security)**:
+   - To prevent secrets (MongoDB credentials, JWT signing keys, passwords) from being exposed in plaintext, **no `.env` file is deployed to the production directory**.
+   - `scripts\build_sea.js` compiles the configuration directly into the encrypted executable binary.
+   - Any accidental `.env` in the deployment directory is automatically removed.
 2. **Persistent `uploads/` Directory Preservation**:
-   - Robocopy excludes `/XD "%API_SERVICE_DIR%\uploads"` and `/XD "%STAGING_API_DIR%\uploads"`.
-   - Existing user-uploaded files, receipts, and images in `D:\study\New folder\uploads` are never wiped, mirrored, or overwritten.
+   - Uploads in `%API_SERVICE_DIR%\uploads` are preserved and served directly at `/uploads`.
 3. **Production `logs/` Directory Preservation**:
-   - Robocopy excludes `/XD "%API_SERVICE_DIR%\logs"` and `/XD "%STAGING_API_DIR%\logs"`.
-   - Winston daily rotating logs (`app-*.log`, `error-*.log`) are never deleted during deployment or rollback.
+   - Winston rotating logs and NSSM service stdout/stderr logs are stored in `%API_SERVICE_DIR%\logs` and never wiped during deployment or rollback.
 4. **Scope of Backups**:
-   - The API backup (`backups\api_YYYYMMDD_HHMMSS\`) contains the application code, executable (`myNode.exe`), runtime dependencies (`node_modules`), and `.env`. It **does not** include persistent `logs/` or `uploads/` to avoid copying large binary assets or active rotating logs.
+   - The API backup (`backups\api_YYYYMMDD_HHMMSS\`) stores exclusively the live executable (`myNode.exe`) and nothing else.
    - The UI backup (`backups\ui_YYYYMMDD_HHMMSS\`) contains all static assets from the Nginx document root.
 5. **First-Time Deployment Handling**:
    - If no prior service files or UI files exist, the script records first-time deployment status and clearly reports that prior rollback is unavailable.

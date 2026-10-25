@@ -20,6 +20,9 @@ if %ERRORLEVEL% neq 0 (
     goto :FAILED_NO_ROLLBACK
 )
 
+:: 0.1 Optional custom configuration file (if present)
+if exist "%ROOT_DIR%\deploy.config.bat" call "%ROOT_DIR%\deploy.config.bat"
+
 set "UI_SRC_DIR=%ROOT_DIR%\ui"
 set "API_SRC_DIR=%ROOT_DIR%\api"
 
@@ -27,15 +30,64 @@ set "STAGING_DIR=%ROOT_DIR%\staging"
 set "STAGING_UI_DIR=%STAGING_DIR%\ui"
 set "STAGING_API_DIR=%STAGING_DIR%\api"
 
-set "NGINX_DIR=D:\Softwares\nginx"
-set "NGINX_EXE=%NGINX_DIR%\nginx.exe"
-set "NGINX_CONF=%NGINX_DIR%\conf\nginx.conf"
-set "NGINX_DOC_ROOT=D:\study\templeApp\ui\dist\ui\browser"
+:: 0.2 Resolve Nginx Document Root dynamically relative to workspace
+if "%NGINX_DOC_ROOT%"=="" set "NGINX_DOC_ROOT=%ROOT_DIR%\ui\dist\ui\browser"
 
-set "NSSM_EXE=D:\Softwares\nssm-2.24\nssm-2.24\win64\nssm.exe"
-set "API_SERVICE_NAME=MYNODE-2"
-set "API_SERVICE_DIR=D:\study\New folder"
-set "API_PROD_EXE=%API_SERVICE_DIR%\myNode.exe"
+:: 0.3 Resolve Nginx installation dynamically (PATH, environment, relative, or standard drives)
+if "%NGINX_DIR%"=="" (
+    where nginx >nul 2>&1 && (
+        for /f "tokens=*" %%i in ('where nginx 2^>nul') do (
+            if not defined NGINX_DIR if exist "%%i" (
+                set "NGINX_EXE=%%i"
+                for %%d in ("%%i") do set "NGINX_DIR=%%~dpd"
+            )
+        )
+    )
+)
+if "%NGINX_DIR%"=="" if exist "%ROOT_DIR%\Softwares\nginx\nginx.exe" set "NGINX_DIR=%ROOT_DIR%\Softwares\nginx"
+if "%NGINX_DIR%"=="" if exist "%ROOT_DIR%\..\Softwares\nginx\nginx.exe" set "NGINX_DIR=%ROOT_DIR%\..\Softwares\nginx"
+if "%NGINX_DIR%"=="" if exist "D:\Softwares\nginx\nginx.exe" set "NGINX_DIR=D:\Softwares\nginx"
+if "%NGINX_DIR%"=="" if exist "C:\Softwares\nginx\nginx.exe" set "NGINX_DIR=C:\Softwares\nginx"
+if "%NGINX_DIR%"=="" if exist "%SystemDrive%\Softwares\nginx\nginx.exe" set "NGINX_DIR=%SystemDrive%\Softwares\nginx"
+if "%NGINX_DIR%"=="" if exist "C:\nginx\nginx.exe" set "NGINX_DIR=C:\nginx"
+if "%NGINX_DIR%"=="" if exist "D:\nginx\nginx.exe" set "NGINX_DIR=D:\nginx"
+if "%NGINX_DIR%"=="" if exist "%ProgramFiles%\nginx\nginx.exe" set "NGINX_DIR=%ProgramFiles%\nginx"
+
+if defined NGINX_DIR (
+    if "%NGINX_DIR:~-1%"=="\" set "NGINX_DIR=%NGINX_DIR:~0,-1%"
+    if "%NGINX_EXE%"=="" set "NGINX_EXE=%NGINX_DIR%\nginx.exe"
+    if "%NGINX_CONF%"=="" set "NGINX_CONF=%NGINX_DIR%\conf\nginx.conf"
+)
+
+:: 0.4 Resolve NSSM executable dynamically (PATH, environment, relative, or standard drives)
+if "%NSSM_EXE%"=="" (
+    where nssm >nul 2>&1 && (
+        for /f "tokens=*" %%i in ('where nssm 2^>nul') do (
+            if not defined NSSM_EXE if exist "%%i" set "NSSM_EXE=%%i"
+        )
+    )
+)
+if "%NSSM_EXE%"=="" if exist "%ROOT_DIR%\Softwares\nssm-2.24\nssm-2.24\win64\nssm.exe" set "NSSM_EXE=%ROOT_DIR%\Softwares\nssm-2.24\nssm-2.24\win64\nssm.exe"
+if "%NSSM_EXE%"=="" if exist "%ROOT_DIR%\..\Softwares\nssm-2.24\nssm-2.24\win64\nssm.exe" set "NSSM_EXE=%ROOT_DIR%\..\Softwares\nssm-2.24\nssm-2.24\win64\nssm.exe"
+if "%NSSM_EXE%"=="" if exist "D:\Softwares\nssm-2.24\nssm-2.24\win64\nssm.exe" set "NSSM_EXE=D:\Softwares\nssm-2.24\nssm-2.24\win64\nssm.exe"
+if "%NSSM_EXE%"=="" if exist "C:\Softwares\nssm-2.24\nssm-2.24\win64\nssm.exe" set "NSSM_EXE=C:\Softwares\nssm-2.24\nssm-2.24\win64\nssm.exe"
+if "%NSSM_EXE%"=="" if exist "%SystemDrive%\Softwares\nssm-2.24\nssm-2.24\win64\nssm.exe" set "NSSM_EXE=%SystemDrive%\Softwares\nssm-2.24\nssm-2.24\win64\nssm.exe"
+if "%NSSM_EXE%"=="" if exist "C:\nssm\win64\nssm.exe" set "NSSM_EXE=C:\nssm\win64\nssm.exe"
+if "%NSSM_EXE%"=="" if exist "D:\nssm\win64\nssm.exe" set "NSSM_EXE=D:\nssm\win64\nssm.exe"
+if "%NSSM_EXE%"=="" if exist "%ProgramFiles%\nssm\win64\nssm.exe" set "NSSM_EXE=%ProgramFiles%\nssm\win64\nssm.exe"
+if "%NSSM_EXE%"=="" if exist "%ProgramFiles(x86)%\nssm\win64\nssm.exe" set "NSSM_EXE=%ProgramFiles(x86)%\nssm\win64\nssm.exe"
+if "%NSSM_EXE%"=="" if exist "C:\ProgramData\chocolatey\bin\nssm.exe" set "NSSM_EXE=C:\ProgramData\chocolatey\bin\nssm.exe"
+
+:: 0.5 Configure API Service parameters dynamically relative to workspace
+if "%API_SERVICE_NAME%"=="" set "API_SERVICE_NAME=MYNODE-2"
+if "%API_SERVICE_DIR%"=="" (
+    if exist "%ROOT_DIR%\deloyment" (
+        set "API_SERVICE_DIR=%ROOT_DIR%\deloyment"
+    ) else (
+        set "API_SERVICE_DIR=%ROOT_DIR%\deployment"
+    )
+)
+if "%API_PROD_EXE%"=="" set "API_PROD_EXE=%API_SERVICE_DIR%\myNode.exe"
 
 set "BACKUP_BASE_DIR=%ROOT_DIR%\backups"
 
@@ -77,16 +129,28 @@ if %ERRORLEVEL% neq 0 (
     echo [ERROR] Node.js is not found in system PATH. Aborting.
     goto :FAILED_NO_ROLLBACK
 )
+if "%NSSM_EXE%"=="" (
+    echo [ERROR] NSSM executable could not be detected.
+    echo [INFO] Please install NSSM into PATH, place it in "Softwares\nssm-2.24\nssm-2.24\win64\nssm.exe",
+    echo [INFO] or set the NSSM_EXE environment variable.
+    goto :FAILED_NO_ROLLBACK
+)
 if not exist "%NSSM_EXE%" (
-    echo [ERROR] NSSM executable not found at "%NSSM_EXE%". Aborting.
+    echo [ERROR] NSSM executable not found at "%NSSM_EXE%".
+    goto :FAILED_NO_ROLLBACK
+)
+if "%NGINX_EXE%"=="" (
+    echo [ERROR] Nginx executable could not be detected.
+    echo [INFO] Please install Nginx into PATH, place it in "Softwares\nginx\nginx.exe" or "C:\nginx\nginx.exe",
+    echo [INFO] or set the NGINX_DIR environment variable.
     goto :FAILED_NO_ROLLBACK
 )
 if not exist "%NGINX_EXE%" (
-    echo [ERROR] Nginx executable not found at "%NGINX_EXE%". Aborting.
+    echo [ERROR] Nginx executable not found at "%NGINX_EXE%".
     goto :FAILED_NO_ROLLBACK
 )
 if not exist "%NGINX_CONF%" (
-    echo [ERROR] Nginx configuration file not found at "%NGINX_CONF%". Aborting.
+    echo [ERROR] Nginx configuration file not found at "%NGINX_CONF%".
     goto :FAILED_NO_ROLLBACK
 )
 
@@ -149,13 +213,13 @@ if not exist "%API_SRC_DIR%" (
 )
 
 set "STAGED_API_EXE=%STAGING_API_DIR%\myNode.exe"
+if not exist "%STAGING_API_DIR%" mkdir "%STAGING_API_DIR%"
 
-:: 2.1 Copy API runtime files, application code, dependencies, and native addons to staging
-echo [INFO] Staging API runtime files, code, and node_modules...
-robocopy "%API_SRC_DIR%" "%STAGING_API_DIR%" /E /XD "%API_SRC_DIR%\dist" "%API_SRC_DIR%\logs" "%API_SRC_DIR%\scratch" "%API_SRC_DIR%\scripts" /XF "*.log" /R:2 /W:1 >nul 2>&1
-set "ROBO_STAGE_API=%ERRORLEVEL%"
-if %ROBO_STAGE_API% geq 8 (
-    echo [ERROR] Failed to stage API runtime files. Robocopy exit code: %ROBO_STAGE_API%.
+:: 2.1 Build self-contained SEA preparation bundle using scripts\build_sea.js
+echo [INFO] Compiling and bundling API code into self-contained SEA preparation blob...
+node "%ROOT_DIR%\scripts\build_sea.js" "%STAGING_API_DIR%"
+if %ERRORLEVEL% neq 0 (
+    echo [ERROR] Failed to compile self-contained SEA bundle. Live deployment untouched.
     goto :FAILED_NO_ROLLBACK
 )
 
@@ -163,28 +227,7 @@ if %ROBO_STAGE_API% geq 8 (
 if not exist "%STAGING_API_DIR%\logs" mkdir "%STAGING_API_DIR%\logs"
 if not exist "%STAGING_API_DIR%\uploads" mkdir "%STAGING_API_DIR%\uploads"
 
-:: 2.2 Generate Node.js 24 SEA bootstrap script without parenthesized echo blocks
-echo [INFO] Generating Node 24 Single Executable Application [SEA] bootstrap...
-echo const path = require('node:path');> "%STAGING_API_DIR%\sea-entry.js"
-echo const { createRequire } = require('node:module');>> "%STAGING_API_DIR%\sea-entry.js"
-echo const appDir = path.dirname(process.execPath);>> "%STAGING_API_DIR%\sea-entry.js"
-echo process.chdir(appDir);>> "%STAGING_API_DIR%\sea-entry.js"
-echo const req = createRequire(path.join(appDir, 'package.json'));>> "%STAGING_API_DIR%\sea-entry.js"
-echo req('./index.js');>> "%STAGING_API_DIR%\sea-entry.js"
-
-echo {> "%STAGING_API_DIR%\sea-config.json"
-echo   "main": "sea-entry.js",>> "%STAGING_API_DIR%\sea-config.json"
-echo   "output": "sea-prep.blob">> "%STAGING_API_DIR%\sea-config.json"
-echo }>> "%STAGING_API_DIR%\sea-config.json"
-
-cd /d "%STAGING_API_DIR%"
-echo [INFO] Compiling SEA preparation blob...
-node --experimental-sea-config sea-config.json >nul 2>&1
-if %ERRORLEVEL% neq 0 (
-    echo [ERROR] Failed to generate SEA preparation blob. Live deployment untouched.
-    goto :FAILED_NO_ROLLBACK
-)
-
+:: 2.2 Inject SEA blob into Windows executable
 for /f "tokens=*" %%p in ('where node') do (
     set "NODE_BINARY_PATH=%%p"
     goto :RESOLVED_NODE
@@ -208,7 +251,7 @@ if not exist "%STAGED_API_EXE%" (
     goto :FAILED_NO_ROLLBACK
 )
 
-echo [SUCCESS] Staged API runtime bundle assembled with executable at "%STAGED_API_EXE%"
+echo [SUCCESS] Self-contained API executable assembled at "%STAGED_API_EXE%"
 cd /d "%ROOT_DIR%"
 echo.
 
@@ -282,41 +325,21 @@ if exist "%NGINX_DOC_ROOT%\index.html" (
     echo [INFO] No live UI found at "%NGINX_DOC_ROOT%". First-time UI deployment detected.
 )
 
-:: 4.2 Backup Live API runtime files (excluding active logs)
-if exist "%API_SERVICE_DIR%" (
-    echo [BACKUP] Backing up live API runtime files from "%API_SERVICE_DIR%" to "%API_BACKUP_DIR%"...
+:: 4.2 Backup Live API executable only (nothing else)
+if exist "%API_PROD_EXE%" (
+    echo [BACKUP] Backing up live API executable from "%API_PROD_EXE%" to "%API_BACKUP_DIR%"...
     mkdir "%API_BACKUP_DIR%" 2>nul
-    robocopy "%API_SERVICE_DIR%" "%API_BACKUP_DIR%" /E /XD "%API_SERVICE_DIR%\logs" /R:2 /W:1 >nul 2>&1
-    set "ROBO_BACKUP_API=!ERRORLEVEL!"
-    if !ROBO_BACKUP_API! lss 8 (
-        :: Verify backup integrity of key production files if they were present
-        if exist "%API_SERVICE_DIR%\myNode.exe" (
-            if not exist "%API_BACKUP_DIR%\myNode.exe" (
-                echo [ERROR] Backup integrity check failed: myNode.exe missing from backup.
-                goto :FAILED_NO_ROLLBACK
-            )
-        )
-        if exist "%API_SERVICE_DIR%\.env" (
-            if not exist "%API_BACKUP_DIR%\.env" (
-                echo [ERROR] Backup integrity check failed: .env missing from backup.
-                goto :FAILED_NO_ROLLBACK
-            )
-        )
-        if exist "%API_SERVICE_DIR%\package.json" (
-            if not exist "%API_BACKUP_DIR%\package.json" (
-                echo [ERROR] Backup integrity check failed: package.json missing from backup.
-                goto :FAILED_NO_ROLLBACK
-            )
-        )
+    copy /y "%API_PROD_EXE%" "%API_BACKUP_DIR%\myNode.exe" >nul 2>&1
+    if exist "%API_BACKUP_DIR%\myNode.exe" (
         set "API_BACKED_UP=1"
-        echo [SUCCESS] Live API directory backed up and verified at "%API_BACKUP_DIR%".
+        echo [SUCCESS] Live API executable backed up and verified at "%API_BACKUP_DIR%\myNode.exe".
     ) else (
-        echo [ERROR] Live API backup failed. Aborting before modifying production.
+        echo [ERROR] Live API executable backup failed. Aborting before modifying production.
         goto :FAILED_NO_ROLLBACK
     )
 ) else (
     set "FIRST_TIME_API=1"
-    echo [INFO] No live API service directory found at "%API_SERVICE_DIR%". First-time API deployment detected.
+    echo [INFO] No live API executable found at "%API_PROD_EXE%". First-time API deployment detected.
 )
 echo.
 
@@ -414,33 +437,23 @@ sc.exe query %API_SERVICE_NAME% >nul 2>&1 && (
     echo [INFO] Service will be created and configured with NSSM after file staging.
 )
 
-:: Production .env preservation logic
-if exist "%API_SERVICE_DIR%\.env" (
-    echo [INFO] Existing production .env detected. Preserving production .env byte-for-byte.
-    set "EXCLUDE_ENV_PARAM=/XF .env"
-) else (
-    echo [WARNING] No production .env detected. Initializing from staged .env template.
-    echo [WARNING] Ensure production credentials, MongoDB URI, and secrets in "%API_SERVICE_DIR%\.env" are reviewed.
-    set "EXCLUDE_ENV_PARAM="
-)
-
-:: Synchronize verified staging API bundle, explicitly PRESERVING logs and uploads directories
-echo [INFO] Deploying verified API bundle into "%API_SERVICE_DIR%" [preserving uploads and logs]...
-robocopy "%STAGING_API_DIR%" "%API_SERVICE_DIR%" /E /XD "%STAGING_API_DIR%\logs" "%STAGING_API_DIR%\uploads" "%API_SERVICE_DIR%\logs" "%API_SERVICE_DIR%\uploads" %EXCLUDE_ENV_PARAM% /XF "sea-config.json" "sea-entry.js" "sea-prep.blob" /R:2 /W:1 >nul 2>&1
-set "ROBO_API_EXIT=%ERRORLEVEL%"
-if %ROBO_API_EXIT% geq 8 (
-    echo [ERROR] Failed to synchronize API bundle to "%API_SERVICE_DIR%" [Code: %ROBO_API_EXIT%].
-    goto :ROLLBACK
-)
-
+:: Deploy self-contained executable to API service directory (storing ONLY myNode.exe and logs)
+echo [INFO] Deploying self-contained executable to "%API_SERVICE_DIR%"...
+copy /y "%STAGED_API_EXE%" "%API_PROD_EXE%" >nul 2>&1
 if not exist "%API_PROD_EXE%" (
     echo [ERROR] Deployed executable missing at "%API_PROD_EXE%".
     goto :ROLLBACK
 )
 
-:: Ensure persistent directories exist without modifying existing content
+:: Ensure logs and uploads directories exist for runtime output
 if not exist "%API_SERVICE_DIR%\logs" mkdir "%API_SERVICE_DIR%\logs"
 if not exist "%API_SERVICE_DIR%\uploads" mkdir "%API_SERVICE_DIR%\uploads"
+
+:: Strictly remove any plaintext .env from the deployment directory to protect secrets
+if exist "%API_SERVICE_DIR%\.env" (
+    del /f /q "%API_SERVICE_DIR%\.env" >nul 2>&1
+    echo [SECURITY] Plaintext .env removed from deployment directory. Secrets are securely compiled into executable.
+)
 
 :: Install NSSM service if not currently installed
 sc.exe query %API_SERVICE_NAME% >nul 2>&1 || (
@@ -605,20 +618,19 @@ if "!API_ALTERED!"=="1" (
         "%NSSM_EXE%" remove %API_SERVICE_NAME% confirm >nul 2>&1
         echo [SUCCESS] Newly installed NSSM service removed.
         if "%API_BACKED_UP%"=="1" (
-            echo [ROLLBACK] Restoring previous API runtime files from "%API_BACKUP_DIR%" to "%API_SERVICE_DIR%" [preserving uploads/logs]...
-            robocopy "%API_BACKUP_DIR%" "%API_SERVICE_DIR%" /E /XD "%API_SERVICE_DIR%\logs" "%API_SERVICE_DIR%\uploads" /R:2 /W:1 >nul 2>&1
-            echo [SUCCESS] Previous API files restored from backup.
+            echo [ROLLBACK] Restoring previous API executable from "%API_BACKUP_DIR%\myNode.exe" to "%API_PROD_EXE%"...
+            copy /y "%API_BACKUP_DIR%\myNode.exe" "%API_PROD_EXE%" >nul 2>&1
+            echo [SUCCESS] Previous API executable restored from backup.
         )
         set "RESTORED_API=1"
     ) else if "%API_BACKED_UP%"=="1" (
         echo [ROLLBACK] Stopping NSSM service %API_SERVICE_NAME%...
         "%NSSM_EXE%" stop %API_SERVICE_NAME% >nul 2>&1
         timeout /t 2 /nobreak >nul
-        echo [ROLLBACK] Restoring previous API runtime files from "%API_BACKUP_DIR%" to "%API_SERVICE_DIR%" [preserving uploads/logs]...
-        robocopy "%API_BACKUP_DIR%" "%API_SERVICE_DIR%" /E /XD "%API_SERVICE_DIR%\logs" "%API_SERVICE_DIR%\uploads" /R:2 /W:1 >nul 2>&1
-        set "ROBO_RB_EXIT=!ERRORLEVEL!"
-        if !ROBO_RB_EXIT! lss 8 (
-            echo [SUCCESS] Previous API files restored from backup.
+        echo [ROLLBACK] Restoring previous API executable from "%API_BACKUP_DIR%\myNode.exe" to "%API_PROD_EXE%"...
+        copy /y "%API_BACKUP_DIR%\myNode.exe" "%API_PROD_EXE%" >nul 2>&1
+        if exist "%API_PROD_EXE%" (
+            echo [SUCCESS] Previous API executable restored from backup.
             echo [ROLLBACK] Restarting NSSM service %API_SERVICE_NAME%...
             "%NSSM_EXE%" start %API_SERVICE_NAME% >nul 2>&1
             timeout /t 4 /nobreak >nul
@@ -635,7 +647,7 @@ if "!API_ALTERED!"=="1" (
                 echo [ERROR] Failed to confirm NSSM service running after rollback.
             )
         ) else (
-            echo [ERROR] Robocopy failed to restore API files from backup. Service will NOT be started.
+            echo [ERROR] Failed to restore API executable from backup. Service will NOT be started.
         )
     ) else (
         if "%FIRST_TIME_API%"=="1" (

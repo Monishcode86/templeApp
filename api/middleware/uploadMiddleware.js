@@ -11,7 +11,7 @@ const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'];
  * Configure Multer disk storage for a given subfolder (e.g. 'users' or 'plants')
  */
 const createDiskStorage = (subfolder) => {
-    const uploadDir = path.join(__dirname, `../uploads/${subfolder}`);
+    const uploadDir = path.join(process.cwd(), 'uploads', subfolder);
 
     // Ensure upload directory exists synchronously on startup
     if (!fs.existsSync(uploadDir)) {

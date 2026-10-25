@@ -26,7 +26,8 @@ const deleteLocalImageFile = (imageUrl) => {
     if (!imageUrl || typeof imageUrl !== 'string') return;
     try {
         if (imageUrl.startsWith('/uploads/')) {
-            const filePath = path.join(__dirname, '..', imageUrl);
+            const relPath = imageUrl.startsWith('/') ? imageUrl.slice(1) : imageUrl;
+            const filePath = path.join(process.cwd(), relPath);
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
                 logger.info(`Cleaned up image file from disk: ${filePath}`);

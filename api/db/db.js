@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const UserModel = require('../model/userModel');
 const logger = require('../config/logger');
 
-const URI = process.env.URI;
+const URI = process.env.URI || 'mongodb://127.0.0.1:27017/node24api';
 const adminPassword = process.env.adminUserPasssword || process.env.ADMIN_PASSWORD;
 const adminEmail = (process.env.ADMIN_EMAIL || 'admin@gmail.com').toLowerCase().trim();
 const saltRounds = Number(process.env.HASH_ROUNDS ?? process.env.HASHROUNT ?? 10);

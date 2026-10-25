@@ -3,7 +3,7 @@ require('winston-daily-rotate-file');
 const path = require('path');
 const fs = require('fs');
 
-const logDirectory = process.env.LOG_DIR || path.join(__dirname, '..', 'logs');
+const logDirectory = process.env.LOG_DIR || path.join(process.cwd(), 'logs');
 
 // Ensure log directory exists
 if (!fs.existsSync(logDirectory)) {
