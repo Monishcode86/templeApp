@@ -52,6 +52,8 @@ set "UI_ALTERED=0"
 set "API_ALTERED=0"
 set "FIRST_TIME_API=0"
 set "FIRST_TIME_UI=0"
+set "SERVICE_WAS_INSTALLED=0"
+sc.exe query %API_SERVICE_NAME% >nul 2>&1 && set "SERVICE_WAS_INSTALLED=1"
 
 echo [CONFIG] Workspace Root:       "%ROOT_DIR%"
 echo [CONFIG] Staging Dir:          "%STAGING_DIR%"
@@ -59,6 +61,11 @@ echo [CONFIG] Nginx Executable:     "%NGINX_EXE%"
 echo [CONFIG] Nginx Document Root:  "%NGINX_DOC_ROOT%"
 echo [CONFIG] NSSM Executable:      "%NSSM_EXE%"
 echo [CONFIG] NSSM Service Name:    %API_SERVICE_NAME%
+if "!SERVICE_WAS_INSTALLED!"=="1" (
+    echo [CONFIG] NSSM Service Status:  Installed
+) else (
+    echo [CONFIG] NSSM Service Status:  Not Installed [Will auto-install in Step 6]
+)
 echo [CONFIG] API Service Dir:      "%API_SERVICE_DIR%"
 echo [CONFIG] API Target Path:      "%API_PROD_EXE%"
 echo [CONFIG] Backup Timestamp:     %TIMESTAMP%
@@ -378,24 +385,34 @@ echo -----------------------------------------------------------------------
 set "API_ALTERED=1"
 if not exist "%API_SERVICE_DIR%" mkdir "%API_SERVICE_DIR%"
 
-:: Stop NSSM Service and verify actual stopped state
-echo [INFO] Stopping NSSM service %API_SERVICE_NAME%...
-"%NSSM_EXE%" stop %API_SERVICE_NAME% >nul 2>&1
-
-set "SERVICE_STOPPED=0"
-for /l %%k in (1,1,10) do (
+:: Check if NSSM Service is currently installed
+sc.exe query %API_SERVICE_NAME% >nul 2>&1 && (
+    set "SERVICE_CURRENTLY_INSTALLED=1"
     sc.exe query %API_SERVICE_NAME% 2>&1 | findstr /I "STOPPED" >nul 2>&1 && (
-        set "SERVICE_STOPPED=1"
-        goto :STOP_CONFIRMED
+        echo [INFO] Existing NSSM service %API_SERVICE_NAME% is already in state STOPPED.
+    ) || (
+        echo [INFO] Stopping existing NSSM service %API_SERVICE_NAME%...
+        "%NSSM_EXE%" stop %API_SERVICE_NAME% >nul 2>&1
+        set "SERVICE_STOPPED=0"
+        for /l %%k in (1,1,10) do (
+            sc.exe query %API_SERVICE_NAME% 2>&1 | findstr /I "STOPPED" >nul 2>&1 && (
+                set "SERVICE_STOPPED=1"
+                goto :STOP_CONFIRMED
+            )
+            timeout /t 1 /nobreak >nul
+        )
+        :STOP_CONFIRMED
+        if not "!SERVICE_STOPPED!"=="1" (
+            echo [ERROR] NSSM service %API_SERVICE_NAME% failed to reach SERVICE_STOPPED state within 10 seconds.
+            goto :ROLLBACK
+        )
+        echo [SUCCESS] NSSM service %API_SERVICE_NAME% confirmed stopped.
     )
-    timeout /t 1 /nobreak >nul
+) || (
+    set "SERVICE_CURRENTLY_INSTALLED=0"
+    echo [INFO] NSSM service %API_SERVICE_NAME% is not currently installed.
+    echo [INFO] Service will be created and configured with NSSM after file staging.
 )
-:STOP_CONFIRMED
-if not "!SERVICE_STOPPED!"=="1" (
-    echo [ERROR] NSSM service %API_SERVICE_NAME% failed to reach SERVICE_STOPPED state within 10 seconds.
-    goto :ROLLBACK
-)
-echo [SUCCESS] NSSM service %API_SERVICE_NAME% confirmed stopped.
 
 :: Production .env preservation logic
 if exist "%API_SERVICE_DIR%\.env" (
@@ -424,6 +441,26 @@ if not exist "%API_PROD_EXE%" (
 :: Ensure persistent directories exist without modifying existing content
 if not exist "%API_SERVICE_DIR%\logs" mkdir "%API_SERVICE_DIR%\logs"
 if not exist "%API_SERVICE_DIR%\uploads" mkdir "%API_SERVICE_DIR%\uploads"
+
+:: Install NSSM service if not currently installed
+sc.exe query %API_SERVICE_NAME% >nul 2>&1 || (
+    echo [INFO] Installing NSSM service %API_SERVICE_NAME% with target "%API_PROD_EXE%"...
+    "%NSSM_EXE%" install %API_SERVICE_NAME% "%API_PROD_EXE%" >nul 2>&1
+    timeout /t 1 /nobreak >nul
+    sc.exe query %API_SERVICE_NAME% >nul 2>&1
+    if errorlevel 1 (
+        echo [ERROR] Failed to install NSSM service %API_SERVICE_NAME%.
+        goto :ROLLBACK
+    )
+    echo [SUCCESS] NSSM service %API_SERVICE_NAME% installed successfully.
+)
+
+:: Synchronize service parameters
+"%NSSM_EXE%" set %API_SERVICE_NAME% Application "%API_PROD_EXE%" >nul 2>&1
+"%NSSM_EXE%" set %API_SERVICE_NAME% AppDirectory "%API_SERVICE_DIR%" >nul 2>&1
+"%NSSM_EXE%" set %API_SERVICE_NAME% Start SERVICE_AUTO_START >nul 2>&1
+"%NSSM_EXE%" set %API_SERVICE_NAME% AppStdout "%API_SERVICE_DIR%\logs\service.log" >nul 2>&1
+"%NSSM_EXE%" set %API_SERVICE_NAME% AppStderr "%API_SERVICE_DIR%\logs\service.err.log" >nul 2>&1
 
 :: Start NSSM Service and verify running state
 echo [INFO] Starting NSSM service %API_SERVICE_NAME%...
@@ -561,7 +598,19 @@ set "RESTORED_API=0"
 
 :: 1. Rollback API service directory
 if "!API_ALTERED!"=="1" (
-    if "%API_BACKED_UP%"=="1" (
+    if "!SERVICE_WAS_INSTALLED!"=="0" (
+        echo [ROLLBACK] Stopping and removing newly installed NSSM service %API_SERVICE_NAME%...
+        "%NSSM_EXE%" stop %API_SERVICE_NAME% >nul 2>&1
+        timeout /t 2 /nobreak >nul
+        "%NSSM_EXE%" remove %API_SERVICE_NAME% confirm >nul 2>&1
+        echo [SUCCESS] Newly installed NSSM service removed.
+        if "%API_BACKED_UP%"=="1" (
+            echo [ROLLBACK] Restoring previous API runtime files from "%API_BACKUP_DIR%" to "%API_SERVICE_DIR%" [preserving uploads/logs]...
+            robocopy "%API_BACKUP_DIR%" "%API_SERVICE_DIR%" /E /XD "%API_SERVICE_DIR%\logs" "%API_SERVICE_DIR%\uploads" /R:2 /W:1 >nul 2>&1
+            echo [SUCCESS] Previous API files restored from backup.
+        )
+        set "RESTORED_API=1"
+    ) else if "%API_BACKED_UP%"=="1" (
         echo [ROLLBACK] Stopping NSSM service %API_SERVICE_NAME%...
         "%NSSM_EXE%" stop %API_SERVICE_NAME% >nul 2>&1
         timeout /t 2 /nobreak >nul

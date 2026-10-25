@@ -18,8 +18,8 @@ Every path, service name, and configuration parameter has been confirmed on the 
 | **Node.js API Source** | `D:\study\templeApp\api` | Express 5 application (`index.js`) |
 | **API Executable Technology** | Node.js 24 Single Executable Application (SEA) | Executable (`myNode.exe`) fused with bootstrap blob via `postject` |
 | **NSSM Executable** | `D:\Softwares\nssm-2.24\nssm-2.24\win64\nssm.exe` | Verified exact binary path |
-| **API NSSM Service** | `MYNODE-2` | Registered Windows service managed by NSSM |
-| **API Target Executable** | `D:\study\New folder\myNode.exe` | Binary path registered under `MYNODE-2\Parameters` |
+| **API NSSM Service** | `MYNODE-2` | Registered Windows service (auto-created and configured if not present) |
+| **API Target Executable** | `D:\study\New folder\myNode.exe` | Binary path configured in NSSM |
 | **API Service Directory** | `D:\study\New folder` | Working directory configured in NSSM (quotes handle spaces) |
 | **Nginx Installation** | `D:\Softwares\nginx` | `D:\Softwares\nginx\nginx.exe` |
 | **Nginx Configuration** | `D:\Softwares\nginx\conf\nginx.conf` | Reverse proxies `/api/` and `/health` to `http://127.0.0.1:5000` |
