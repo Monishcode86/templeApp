@@ -11,6 +11,9 @@ api/.env
 # Build Outputs
 dist/
 ui/dist/
+api/dist/
+staging/
+backups/
 out-tsc/
 bazel-out/
 tmp/
