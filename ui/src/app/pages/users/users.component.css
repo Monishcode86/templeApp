@@ -74,9 +74,14 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .user-id-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  height: 40px;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -100,21 +105,46 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-hover);
-  color: var(--text-main);
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--color-primary);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   flex-shrink: 0;
+  padding: 0;
 }
 
 .refresh-code-btn:hover {
   background: var(--color-primary);
   color: #ffffff;
   border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+}
+
+.refresh-code-btn svg,
+.refresh-code-btn .refresh-icon {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  display: block;
+  flex-shrink: 0;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.refresh-code-btn:hover svg,
+.refresh-code-btn:hover .refresh-icon {
+  transform: rotate(180deg);
+  stroke: #ffffff;
+}
+
+.refresh-code-btn:active svg,
+.refresh-code-btn:active .refresh-icon {
+  transform: rotate(360deg);
 }
 
 /* Address Form Section */
