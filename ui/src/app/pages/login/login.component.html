@@ -7,17 +7,29 @@
   <div class="top-controls">
     <div class="lang-pills">
       @for (lang of translationService.availableLanguages; track lang.code) {
-        <button 
-          class="lang-pill" 
-          [class.active]="lang.code === translationService.currentLanguage()" 
-          (click)="changeLanguage(lang.code)">
+        <button
+          class="lang-pill"
+          [class.active]="lang.code === translationService.currentLanguage()"
+          (click)="changeLanguage(lang.code)"
+        >
           {{ lang.flag }} {{ lang.code.toUpperCase() }}
         </button>
       }
     </div>
-    <button class="theme-btn" (click)="toggleTheme()" [title]="themeService.isDark() ? ('THEME_LIGHT' | translate) : ('THEME_DARK' | translate)">
+    <button
+      class="theme-btn"
+      (click)="toggleTheme()"
+      [title]="themeService.isDark() ? ('THEME_LIGHT' | translate) : ('THEME_DARK' | translate)"
+    >
       @if (themeService.isDark()) {
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <circle cx="12" cy="12" r="5"></circle>
           <line x1="12" y1="1" x2="12" y2="3"></line>
           <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -29,7 +41,14 @@
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
         </svg>
       } @else {
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
       }
@@ -40,7 +59,14 @@
   <div class="login-card">
     <div class="card-header">
       <div class="brand-badge">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
           <path d="M2 17l10 5 10-5"></path>
           <path d="M2 12l10 5 10-5"></path>
@@ -53,7 +79,14 @@
     <!-- Error Alert Banner -->
     @if (errorMessage()) {
       <div class="error-banner">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="12" y1="8" x2="12" y2="12"></line>
           <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -67,48 +100,67 @@
       <div class="form-group">
         <label for="identifier">{{ 'IDENTIFIER_LABEL' | translate }}</label>
         <div class="input-container">
-          <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            class="input-icon"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
-          <input 
-            type="text" 
-            id="identifier" 
+          <input
+            type="text"
+            id="identifier"
             name="identifier"
-            [ngModel]="identifier()" 
+            [ngModel]="identifier()"
             (ngModelChange)="identifier.set($event)"
-            [placeholder]="'IDENTIFIER_PLACEHOLDER' | translate" 
+            [placeholder]="'IDENTIFIER_PLACEHOLDER' | translate"
             required
-            autocomplete="username" />
+            autocomplete="username"
+          />
         </div>
       </div>
 
       <div class="form-group">
         <label for="password">{{ 'PASSWORD_LABEL' | translate }}</label>
         <div class="input-container">
-          <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            class="input-icon"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
           </svg>
-          <input 
-            type="password" 
-            id="password" 
+          <input
+            type="password"
+            id="password"
             name="password"
-            [ngModel]="password()" 
+            [ngModel]="password()"
             (ngModelChange)="password.set($event)"
-            [placeholder]="'PASSWORD_PLACEHOLDER' | translate" 
+            [placeholder]="'PASSWORD_PLACEHOLDER' | translate"
             required
-            autocomplete="current-password" />
+            autocomplete="current-password"
+          />
         </div>
       </div>
 
       <div class="form-options">
         <label class="checkbox-container">
-          <input 
-            type="checkbox" 
-            name="remember" 
-            [ngModel]="rememberMe()" 
-            (ngModelChange)="rememberMe.set($event)" />
+          <input
+            type="checkbox"
+            name="remember"
+            [ngModel]="rememberMe()"
+            (ngModelChange)="rememberMe.set($event)"
+          />
           <span class="custom-checkbox"></span>
           <span class="checkbox-label">{{ 'REMEMBER_ME' | translate }}</span>
         </label>
@@ -121,7 +173,14 @@
           <span>{{ 'LOGGING_IN' | translate }}</span>
         } @else {
           <span>{{ 'LOGIN_BUTTON' | translate }}</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <polyline points="12 5 19 12 12 19"></polyline>
           </svg>
@@ -129,10 +188,10 @@
       </button>
     </form>
 
-    <div class="card-footer">
+    <!-- <div class="card-footer">
       <p class="seeding-hint">
         Default credentials: <strong>admin@gmail.com</strong> / <strong>Admin@12345</strong>
       </p>
-    </div>
+    </div> -->
   </div>
 </div>
