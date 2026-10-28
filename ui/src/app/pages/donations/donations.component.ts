@@ -33,13 +33,61 @@ export class DonationsComponent implements OnInit, OnDestroy {
   private translationService = inject(TranslationService);
   private elementRef = inject(ElementRef);
 
-  donationsList = signal<Donation[]>([]);
+  allDonations = signal<Donation[]>([]);
   usersList = signal<User[]>([]);
   searchQuery = signal<string>('');
   filterType = signal<string>('');
   currentPage = signal<number>(1);
   pageSize = signal<number>(10);
-  totalCount = signal<number>(0);
+
+  // Filtered donations based on search query and type filter
+  filteredDonations = computed(() => {
+    const list = this.allDonations();
+    const query = this.searchQuery().trim().toLowerCase();
+    const type = this.filterType();
+
+    return list.filter((don) => {
+      if (type && don.type !== type) {
+        return false;
+      }
+      if (query) {
+        const receiptNo = String(don.receipt_no || '').toLowerCase();
+        const receiptNum = (don.receipt_number || '').toLowerCase();
+        const donor = (don.donor_name || don.username || '').toLowerCase();
+        const uid = (don.user_id || '').toLowerCase();
+        const mobile = (don.donor_mobile || '').toLowerCase();
+        const upi = (don.upi_ref_no || '').toLowerCase();
+        const cheque = (don.cheque_no || '').toLowerCase();
+        const bank = (don.bank_name || '').toLowerCase();
+        const remarks = (don.remarks || '').toLowerCase();
+
+        return (
+          receiptNo.includes(query) ||
+          receiptNum.includes(query) ||
+          donor.includes(query) ||
+          uid.includes(query) ||
+          mobile.includes(query) ||
+          upi.includes(query) ||
+          cheque.includes(query) ||
+          bank.includes(query) ||
+          remarks.includes(query)
+        );
+      }
+      return true;
+    });
+  });
+
+  // Total count of matching filtered donations
+  totalCount = computed(() => this.filteredDonations().length);
+
+  // Paginated donations slice for current page
+  donationsList = computed(() => {
+    const list = this.filteredDonations();
+    const page = this.currentPage();
+    const limit = this.pageSize();
+    const start = (page - 1) * limit;
+    return list.slice(start, start + limit);
+  });
 
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
@@ -102,27 +150,25 @@ export class DonationsComponent implements OnInit, OnDestroy {
 
   readonly donationTypes: Array<'Cash' | 'UPI' | 'Cheque'> = ['Cash', 'UPI', 'Cheque'];
 
-  // Filtered users for combobox
+  // Filtered users for combobox (listing all 500+ users)
   filteredUsers = computed(() => {
     const list = this.usersList();
     const query = this.userSearchText().trim().toLowerCase();
     if (!query) {
-      return list.slice(0, 30);
+      return list;
     }
-    return list
-      .filter((u) => {
-        const name = (u.username || '').toLowerCase();
-        const mobile = (u.mobile_number || '').toLowerCase();
-        const email = (u.email || '').toLowerCase();
-        const uid = (u.user_id || u._id || '').toLowerCase();
-        return (
-          name.includes(query) ||
-          mobile.includes(query) ||
-          email.includes(query) ||
-          uid.includes(query)
-        );
-      })
-      .slice(0, 30);
+    return list.filter((u) => {
+      const name = (u.username || '').toLowerCase();
+      const mobile = (u.mobile_number || '').toLowerCase();
+      const email = (u.email || '').toLowerCase();
+      const uid = (u.user_id || u._id || '').toLowerCase();
+      return (
+        name.includes(query) ||
+        mobile.includes(query) ||
+        email.includes(query) ||
+        uid.includes(query)
+      );
+    });
   });
 
   // Dynamic amount in words (calculated live as user types amount)
@@ -150,13 +196,6 @@ export class DonationsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadDonations();
     this.loadUsersForDropdown();
-
-    this.searchSub = this.searchSubject
-      .pipe(debounceTime(350), distinctUntilChanged())
-      .subscribe(() => {
-        this.currentPage.set(1);
-        this.loadDonations();
-      });
   }
 
   ngOnDestroy(): void {
@@ -167,24 +206,12 @@ export class DonationsComponent implements OnInit, OnDestroy {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    const term = this.searchQuery().trim();
-    const type = this.filterType();
-
+    // Call /donation WITHOUT page and limit query parameters
     this.donationService
-      .getDonations({
-        page: this.currentPage(),
-        limit: this.pageSize(),
-        search: term || undefined,
-        type: type || undefined,
-      })
+      .getDonations()
       .subscribe({
         next: (res) => {
-          this.donationsList.set(res.data || []);
-          if (res.pagination) {
-            this.totalCount.set(res.pagination.total);
-          } else {
-            this.totalCount.set((res.data || []).length);
-          }
+          this.allDonations.set(res.data || []);
           this.isLoading.set(false);
         },
         error: (err) => {
@@ -194,7 +221,7 @@ export class DonationsComponent implements OnInit, OnDestroy {
       });
   }
 
-  loadUsersForDropdown(forceRefresh: boolean = true): void {
+  loadUsersForDropdown(forceRefresh: boolean = false): void {
     this.donationService.getUsersForDropdown(forceRefresh).subscribe({
       next: (res) => {
         const users = (res.data || [])
@@ -311,29 +338,26 @@ export class DonationsComponent implements OnInit, OnDestroy {
 
   onPageChange(page: number): void {
     this.currentPage.set(page);
-    this.loadDonations();
   }
 
   onLimitChange(limit: number): void {
     this.pageSize.set(limit);
     this.currentPage.set(1);
-    this.loadDonations();
   }
 
   onSearchChange(query: string): void {
     this.searchQuery.set(query);
-    this.searchSubject.next(query.trim());
+    this.currentPage.set(1);
   }
 
   clearSearch(): void {
     this.searchQuery.set('');
-    this.searchSubject.next('');
+    this.currentPage.set(1);
   }
 
   onTypeFilterChange(type: string): void {
     this.filterType.set(type);
     this.currentPage.set(1);
-    this.loadDonations();
   }
 
   openAddModal(): void {

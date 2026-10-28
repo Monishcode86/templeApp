@@ -208,8 +208,27 @@ const getAllDonations = async (params = {}) => {
 
     const query = conditions.length === 0 ? {} : conditions.length === 1 ? conditions[0] : { $and: conditions };
 
+    const hasPagination = params.page !== undefined || params.limit !== undefined;
+    const isAll = !hasPagination || params.all === 'true' || params.all === true || params.limit === 'all';
+
+    if (isAll) {
+        const data = await commonDao.findAll(
+            { query, options: { sort: { date: -1, receipt_no: -1, createdAt: -1 } } },
+            SCHEMA_NAME
+        );
+        return {
+            data,
+            pagination: {
+                total: data.length,
+                page: 1,
+                limit: data.length,
+                totalPages: 1
+            }
+        };
+    }
+
     const page = Math.max(1, Number(params.page) || 1);
-    const limit = Math.max(1, Math.min(100, Number(params.limit) || 10));
+    const limit = Math.max(1, Math.min(5000, Number(params.limit) || 10));
 
     return await commonDao.findWithPagination(
         { query, page, limit, sort: { date: -1, receipt_no: -1, createdAt: -1 } },

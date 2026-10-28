@@ -73,8 +73,12 @@ export class UserService {
    * If not cached or forceRefresh is true, fetches all users from backend, caches in memory, and returns.
    */
   getAllUsersCached(forceRefresh: boolean = false): Observable<User[]> {
-    // 1. Check in-memory cache
-    if (!forceRefresh && this.usersMemoryCache && this.usersMemoryCache.length > 0) {
+    if (forceRefresh) {
+      this.clearUsersCache();
+    }
+
+    // 1. Check in-memory cache (must have more than 20 users; if it only has 10 from earlier, it's stale!)
+    if (!forceRefresh && this.usersMemoryCache && this.usersMemoryCache.length > 20) {
       return of(this.usersMemoryCache);
     }
 
@@ -84,13 +88,16 @@ export class UserService {
         const stored = sessionStorage.getItem(this.CACHE_STORAGE_KEY);
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed) && parsed.length > 20) {
             this.usersMemoryCache = parsed;
             return of(parsed);
           }
         }
       } catch { /* ignore parse error */ }
     }
+
+    // If cache only had 10 or fewer items, clear it so all 500+ are fetched
+    this.clearUsersCache();
 
     // 3. Deduplicate concurrent in-flight HTTP requests
     if (this.inFlightFetch$) {
