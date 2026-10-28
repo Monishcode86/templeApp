@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { User, AuthResponse, ApiResponse } from '../models/auth.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
 
+  private readonly authUrl = `${environment.apiUrl || 'https://templeapp-ruvv.onrender.com/api'}/login`;
   private readonly ACCESS_TOKEN_KEY = 'node24_access_token';
   private readonly REFRESH_TOKEN_KEY = 'node24_refresh_token';
   private readonly USER_KEY = 'node24_user';
@@ -29,7 +31,7 @@ export class AuthService {
       identifier: credentials.identifier || credentials.email || credentials.employee_id,
       password: credentials.password
     };
-    return this.http.post<ApiResponse<AuthResponse>>('/api/login', payload).pipe(
+    return this.http.post<ApiResponse<AuthResponse>>(this.authUrl, payload).pipe(
       tap((response) => {
         if (response.data) {
           if (response.data.user?.role !== 'ADMIN') {
@@ -53,7 +55,7 @@ export class AuthService {
       return throwError(() => new Error('No refresh token available.'));
     }
 
-    return this.http.post<ApiResponse<AuthResponse>>('/api/login/refresh', { refreshToken }).pipe(
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.authUrl}/refresh`, { refreshToken }).pipe(
       tap((response) => {
         if (response.data) {
           if (response.data.user && response.data.user.role !== 'ADMIN') {

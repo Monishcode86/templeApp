@@ -15,7 +15,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       // Check for 401 Unauthorized, excluding login or refresh endpoint calls
       const isRefreshRequest = req.url.includes('/api/login/refresh');
-      const isLoginRequest = req.url.endsWith('/api/login');
+      const isLoginRequest = req.url.includes('/api/login') && !req.url.includes('/api/login/me') && !isRefreshRequest;
 
       if (error.status === 401 && !isRefreshRequest && !isLoginRequest && authService.getRefreshToken()) {
         if (!isRefreshing) {

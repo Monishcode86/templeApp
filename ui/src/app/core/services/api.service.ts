@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface RequestOptions {
   headers?: HttpHeaders | { [header: string]: string | string[] };
@@ -14,8 +15,9 @@ export interface RequestOptions {
 export class ApiService {
   private http = inject(HttpClient);
 
-  // Prefix path for all API calls (proxied to backend in development or base domain in production)
-  private readonly baseUrl = '/api';
+  // Base server domain and API prefix path deployed on Render
+  readonly serverUrl = environment.serverUrl || 'https://templeapp-ruvv.onrender.com';
+  readonly baseUrl = environment.apiUrl || `${this.serverUrl}/api`;
 
   /**
    * Generic GET request
@@ -53,11 +55,12 @@ export class ApiService {
    * Direct fetch (e.g. for health probe outside /api)
    */
   fetchDirect<T>(path: string): Observable<T> {
-    return this.http.get<T>(path);
+    const url = path.startsWith('http') ? path : `${this.serverUrl}${path.startsWith('/') ? path : '/' + path}`;
+    return this.http.get<T>(url);
   }
 
   /**
-   * Helper to resolve uploaded image paths in both local dev (4200 -> 5000) and production.
+   * Helper to resolve uploaded image paths (avatars, receipts) from the backend server
    */
   getImageUrl(path?: string | null): string {
     if (!path) return '';
@@ -65,9 +68,6 @@ export class ApiService {
       return path;
     }
     const cleanPath = path.startsWith('/') ? path : `/${path}`;
-    if (typeof window !== 'undefined' && window.location.port === '4200') {
-      return `http://localhost:5000${cleanPath}`;
-    }
-    return cleanPath;
+    return `${this.serverUrl}${cleanPath}`;
   }
 }
