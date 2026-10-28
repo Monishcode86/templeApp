@@ -185,8 +185,8 @@ export class DonationsComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadUsersForDropdown(): void {
-    this.donationService.getUsersForDropdown().subscribe({
+  loadUsersForDropdown(forceRefresh: boolean = false): void {
+    this.donationService.getUsersForDropdown(forceRefresh).subscribe({
       next: (res) => {
         const users = (res.data || [])
           .filter((u) => u.email?.toLowerCase() !== 'admin@gmail.com' && u.role !== 'ADMIN')
@@ -195,6 +195,10 @@ export class DonationsComponent implements OnInit, OnDestroy {
       },
       error: () => { /* silent */ }
     });
+  }
+
+  refreshUsersCache(): void {
+    this.loadUsersForDropdown(true);
   }
 
   // Combobox user selection

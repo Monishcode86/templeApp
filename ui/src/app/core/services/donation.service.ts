@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ApiService } from './api.service';
+import { UserService } from './user.service';
 import { Donation, ApiResponse, User } from '../models/auth.model';
 
 @Injectable({
@@ -8,6 +9,7 @@ import { Donation, ApiResponse, User } from '../models/auth.model';
 })
 export class DonationService {
   private api = inject(ApiService);
+  private userService = inject(UserService);
 
   /**
    * Get all donations with pagination and optional search/type filters
@@ -55,9 +57,14 @@ export class DonationService {
   }
 
   /**
-   * Get users for dropdown (all non-admin users)
+   * Get users for dropdown (all non-admin users) from in-memory cache or server
    */
-  getUsersForDropdown(): Observable<ApiResponse<User[]>> {
-    return this.api.get<ApiResponse<User[]>>('/user', { params: { limit: 500 } });
+  getUsersForDropdown(forceRefresh: boolean = false): Observable<ApiResponse<User[]>> {
+    return this.userService.getAllUsersCached(forceRefresh).pipe(
+      map((users) => ({
+        status: 'Success' as const,
+        data: users
+      }))
+    );
   }
 }

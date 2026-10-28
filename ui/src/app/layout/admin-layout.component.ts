@@ -40,6 +40,12 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     // Poll server health every 30 seconds
     this.healthSub = interval(30000).subscribe(() => this.checkHealth());
 
+    // Preload and store all users in memory cache on layout onload to reuse across donations and dropdowns
+    this.userService.getAllUsersCached().subscribe({
+      next: () => {},
+      error: () => {}
+    });
+
     if (typeof document !== 'undefined') {
       this.isFullscreen.set(!!document.fullscreenElement);
       document.addEventListener('fullscreenchange', this.onFullscreenChange);

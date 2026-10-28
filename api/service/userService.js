@@ -369,8 +369,12 @@ const getalluser = async (params = {}, requestingUser) => {
 
     const query = conditions.length === 1 ? conditions[0] : { $and: conditions };
 
+    const isAll = params.all === 'true' || params.all === true || params.limit === 'all';
     const page = Math.max(1, Number(params.page) || 1);
-    const limit = Math.max(1, Math.min(100, Number(params.limit) || 10));
+    const maxLimitAllowed = isAll ? 50000 : 5000;
+    const limit = isAll
+        ? 50000
+        : Math.max(1, Math.min(maxLimitAllowed, Number(params.limit) || 10));
 
     return await commonDao.findWithPagination(
         {
