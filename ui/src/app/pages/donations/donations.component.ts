@@ -6,7 +6,7 @@ import {
   OnInit,
   OnDestroy,
   ElementRef,
-  HostListener
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -25,7 +25,7 @@ import * as htmlToImage from 'html-to-image';
   standalone: true,
   imports: [CommonModule, FormsModule, TranslatePipe, PaginationComponent],
   templateUrl: './donations.component.html',
-  styleUrls: ['./donations.component.css']
+  styleUrls: ['./donations.component.css'],
 })
 export class DonationsComponent implements OnInit, OnDestroy {
   private donationService = inject(DonationService);
@@ -97,7 +97,7 @@ export class DonationsComponent implements OnInit, OnDestroy {
     amount: '',
     date: this.getTodayDateString(),
     remarks: '',
-    whatsapp_send: false
+    whatsapp_send: false,
   });
 
   readonly donationTypes: Array<'Cash' | 'UPI' | 'Cheque'> = ['Cash', 'UPI', 'Cheque'];
@@ -109,13 +109,20 @@ export class DonationsComponent implements OnInit, OnDestroy {
     if (!query) {
       return list.slice(0, 30);
     }
-    return list.filter((u) => {
-      const name = (u.username || '').toLowerCase();
-      const mobile = (u.mobile_number || '').toLowerCase();
-      const email = (u.email || '').toLowerCase();
-      const uid = (u.user_id || u._id || '').toLowerCase();
-      return name.includes(query) || mobile.includes(query) || email.includes(query) || uid.includes(query);
-    }).slice(0, 30);
+    return list
+      .filter((u) => {
+        const name = (u.username || '').toLowerCase();
+        const mobile = (u.mobile_number || '').toLowerCase();
+        const email = (u.email || '').toLowerCase();
+        const uid = (u.user_id || u._id || '').toLowerCase();
+        return (
+          name.includes(query) ||
+          mobile.includes(query) ||
+          email.includes(query) ||
+          uid.includes(query)
+        );
+      })
+      .slice(0, 30);
   });
 
   // Dynamic amount in words (calculated live as user types amount)
@@ -163,29 +170,31 @@ export class DonationsComponent implements OnInit, OnDestroy {
     const term = this.searchQuery().trim();
     const type = this.filterType();
 
-    this.donationService.getDonations({
-      page: this.currentPage(),
-      limit: this.pageSize(),
-      search: term || undefined,
-      type: type || undefined
-    }).subscribe({
-      next: (res) => {
-        this.donationsList.set(res.data || []);
-        if (res.pagination) {
-          this.totalCount.set(res.pagination.total);
-        } else {
-          this.totalCount.set((res.data || []).length);
-        }
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        this.isLoading.set(false);
-        this.errorMessage.set(err.error?.message || 'Failed to load donations.');
-      }
-    });
+    this.donationService
+      .getDonations({
+        page: this.currentPage(),
+        limit: this.pageSize(),
+        search: term || undefined,
+        type: type || undefined,
+      })
+      .subscribe({
+        next: (res) => {
+          this.donationsList.set(res.data || []);
+          if (res.pagination) {
+            this.totalCount.set(res.pagination.total);
+          } else {
+            this.totalCount.set((res.data || []).length);
+          }
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          this.isLoading.set(false);
+          this.errorMessage.set(err.error?.message || 'Failed to load donations.');
+        },
+      });
   }
 
-  loadUsersForDropdown(forceRefresh: boolean = false): void {
+  loadUsersForDropdown(forceRefresh: boolean = true): void {
     this.donationService.getUsersForDropdown(forceRefresh).subscribe({
       next: (res) => {
         const users = (res.data || [])
@@ -193,7 +202,9 @@ export class DonationsComponent implements OnInit, OnDestroy {
           .sort((a, b) => (a.username || '').localeCompare(b.username || ''));
         this.usersList.set(users);
       },
-      error: () => { /* silent */ }
+      error: () => {
+        /* silent */
+      },
     });
   }
 
@@ -206,7 +217,7 @@ export class DonationsComponent implements OnInit, OnDestroy {
     this.userSearchText.set(text);
     this.formData.update((f) => ({
       ...f,
-      donor_name: text
+      donor_name: text,
     }));
     this.isUserDropdownOpen.set(true);
   }
@@ -237,7 +248,7 @@ export class DonationsComponent implements OnInit, OnDestroy {
       donor_name: u.username,
       donor_mobile: u.mobile_number || '',
       donor_email: u.email || '',
-      donor_address: u.address || ''
+      donor_address: u.address || '',
     }));
     this.isUserDropdownOpen.set(false);
   }
@@ -256,7 +267,7 @@ export class DonationsComponent implements OnInit, OnDestroy {
       donor_name: '',
       donor_mobile: '',
       donor_email: '',
-      donor_address: ''
+      donor_address: '',
     }));
     this.isUserDropdownOpen.set(true);
   }
@@ -273,7 +284,7 @@ export class DonationsComponent implements OnInit, OnDestroy {
       type,
       upi_ref_no: type === 'UPI' ? f.upi_ref_no : '',
       cheque_no: type === 'Cheque' ? f.cheque_no : '',
-      bank_name: type === 'Cheque' ? f.bank_name : ''
+      bank_name: type === 'Cheque' ? f.bank_name : '',
     }));
   }
 
@@ -294,7 +305,7 @@ export class DonationsComponent implements OnInit, OnDestroy {
     this.formData.update((f) => ({
       ...f,
       remarks: text,
-      bank_name: text
+      bank_name: text,
     }));
   }
 
@@ -350,7 +361,7 @@ export class DonationsComponent implements OnInit, OnDestroy {
       amount: '',
       date: this.getTodayDateString(),
       remarks: '',
-      whatsapp_send: false
+      whatsapp_send: false,
     });
     this.isModalOpen.set(true);
   }
@@ -358,7 +369,9 @@ export class DonationsComponent implements OnInit, OnDestroy {
   openEditModal(donation: Donation): void {
     this.modalError.set(null);
     this.isEditMode.set(true);
-    this.userSearchText.set(donation.username ? `${donation.username} (${donation.user_id})` : donation.user_id);
+    this.userSearchText.set(
+      donation.username ? `${donation.username} (${donation.user_id})` : donation.user_id,
+    );
 
     this.formData.set({
       id: donation._id || donation.id,
@@ -375,7 +388,7 @@ export class DonationsComponent implements OnInit, OnDestroy {
       amount: String(donation.amount),
       date: this.formatDateForInput(donation.date || donation.createdAt),
       remarks: donation.remarks || '',
-      whatsapp_send: donation.whatsapp_send
+      whatsapp_send: donation.whatsapp_send,
     });
     this.isModalOpen.set(true);
   }
@@ -420,13 +433,13 @@ export class DonationsComponent implements OnInit, OnDestroy {
       const dataUrl = await htmlToImage.toPng(receiptElem, {
         quality: 1,
         pixelRatio: 2.5,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
       });
 
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
-        format: 'a4'
+        format: 'a4',
       });
 
       const pageWidth = pdf.internal.pageSize.getWidth();
@@ -481,14 +494,16 @@ export class DonationsComponent implements OnInit, OnDestroy {
       this.modalError.set(
         this.formLanguage() === 'ta'
           ? 'தயவுசெய்து தலைமைப் பயனரைத் தேர்ந்தெடுக்கவும்.'
-          : 'Please select a head user (donor).'
+          : 'Please select a head user (donor).',
       );
       return;
     }
 
     if (!data.date?.trim()) {
       this.modalError.set(
-        this.formLanguage() === 'ta' ? 'தேதியைத் தேர்ந்தெடுக்கவும்.' : 'Please select a valid date.'
+        this.formLanguage() === 'ta'
+          ? 'தேதியைத் தேர்ந்தெடுக்கவும்.'
+          : 'Please select a valid date.',
       );
       return;
     }
@@ -498,7 +513,7 @@ export class DonationsComponent implements OnInit, OnDestroy {
       this.modalError.set(
         this.formLanguage() === 'ta'
           ? 'தொகை 0 ஐ விட அதிகமாக இருக்க வேண்டும்.'
-          : 'Amount must be greater than 0.'
+          : 'Amount must be greater than 0.',
       );
       return;
     }
@@ -507,7 +522,7 @@ export class DonationsComponent implements OnInit, OnDestroy {
       this.modalError.set(
         this.formLanguage() === 'ta'
           ? 'தொகை ₹9,99,99,99,999 ஐ தாண்டக்கூடாது.'
-          : 'Amount cannot exceed ₹9,99,99,99,999.'
+          : 'Amount cannot exceed ₹9,99,99,99,999.',
       );
       return;
     }
@@ -516,7 +531,7 @@ export class DonationsComponent implements OnInit, OnDestroy {
       this.modalError.set(
         this.formLanguage() === 'ta'
           ? 'UPI முறைக்கு UPI குறிப்பு எண் (Ref No) கட்டாயம்.'
-          : 'UPI Reference Number is required for UPI donations.'
+          : 'UPI Reference Number is required for UPI donations.',
       );
       return;
     }
@@ -525,7 +540,7 @@ export class DonationsComponent implements OnInit, OnDestroy {
       this.modalError.set(
         this.formLanguage() === 'ta'
           ? 'காசோலை முறைக்கு காசோலை எண் கட்டாயம்.'
-          : 'Cheque Number is required for Cheque donations.'
+          : 'Cheque Number is required for Cheque donations.',
       );
       return;
     }
@@ -543,10 +558,10 @@ export class DonationsComponent implements OnInit, OnDestroy {
         type: data.type,
         upi_ref_no: data.type === 'UPI' ? data.upi_ref_no.trim() : null,
         cheque_no: data.type === 'Cheque' ? data.cheque_no.trim() : null,
-        bank_name: data.type === 'Cheque' ? (data.bank_name?.trim() || null) : null,
+        bank_name: data.type === 'Cheque' ? data.bank_name?.trim() || null : null,
         donor_name: data.donor_name?.trim() || data.username,
         donor_mobile: data.donor_mobile?.trim() || null,
-        remarks: data.remarks?.trim() || null
+        remarks: data.remarks?.trim() || null,
       };
 
       this.donationService.updateDonation(data.id, payload).subscribe({
@@ -559,7 +574,7 @@ export class DonationsComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.isLoading.set(false);
           this.modalError.set(err.error?.message || 'Failed to update donation.');
-        }
+        },
       });
     } else {
       const payload: Partial<Donation> = {
@@ -571,11 +586,11 @@ export class DonationsComponent implements OnInit, OnDestroy {
         type: data.type,
         upi_ref_no: data.type === 'UPI' ? data.upi_ref_no.trim() : null,
         cheque_no: data.type === 'Cheque' ? data.cheque_no.trim() : null,
-        bank_name: data.type === 'Cheque' ? (data.bank_name?.trim() || null) : null,
+        bank_name: data.type === 'Cheque' ? data.bank_name?.trim() || null : null,
         amount: Number(data.amount),
         date: data.date,
         remarks: data.remarks?.trim() || null,
-        whatsapp_send: false
+        whatsapp_send: false,
       };
 
       this.donationService.createDonation(payload).subscribe({
@@ -583,7 +598,9 @@ export class DonationsComponent implements OnInit, OnDestroy {
           this.isLoading.set(false);
           this.closeModal();
           const savedReceipt = res.data;
-          this.showSuccess(`Donation recorded successfully! Receipt No: ${savedReceipt?.receipt_number || ''}`);
+          this.showSuccess(
+            `Donation recorded successfully! Receipt No: ${savedReceipt?.receipt_number || ''}`,
+          );
           this.loadDonations();
           // Open the receipt view modal immediately so the user can inspect/print with the backend-assigned receipt number!
           if (savedReceipt) {
@@ -593,7 +610,7 @@ export class DonationsComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.isLoading.set(false);
           this.modalError.set(err.error?.message || 'Failed to create donation.');
-        }
+        },
       });
     }
   }
@@ -626,15 +643,18 @@ export class DonationsComponent implements OnInit, OnDestroy {
         this.isLoading.set(false);
         this.cancelDelete();
         this.errorMessage.set(err.error?.message || 'Failed to delete donation.');
-      }
+      },
     });
   }
 
   formatAmount(amount: number): string {
-    return '₹' + Number(amount).toLocaleString('en-IN', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
+    return (
+      '₹' +
+      Number(amount).toLocaleString('en-IN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    );
   }
 
   formatDate(dateVal: any): string {
